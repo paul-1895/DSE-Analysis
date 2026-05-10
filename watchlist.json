@@ -1,0 +1,33 @@
+{
+  "watchlists": [
+    {
+      "id": "1778376969492",
+      "name": "Good Banks",
+      "stocks": [
+        {
+          "code": "BRACBANK",
+          "name": "73",
+          "addedAt": "2026-05-10T01:39:47.548Z"
+        }
+      ],
+      "createdAt": "2026-05-10T01:36:09.492Z"
+    },
+    {
+      "id": "1778376982891",
+      "name": "Okay Stocks",
+      "stocks": [
+        {
+          "code": "ACMELAB",
+          "name": "76.4",
+          "addedAt": "2026-05-10T01:39:31.392Z"
+        },
+        {
+          "code": "BRACBANK",
+          "name": "73",
+          "addedAt": "2026-05-10T01:39:48.606Z"
+        }
+      ],
+      "createdAt": "2026-05-10T01:36:22.891Z"
+    }
+  ]
+}

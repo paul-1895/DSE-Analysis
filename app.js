@@ -1,285 +1,10 @@
-/* ============================================
-   DSE LIVE MARKET TRACKER — APP.JS
-   Fetches live data from DSE (dsebd.org)
-   via CORS proxies with fallback chain
-   ============================================ */
-
-// ---- STATE ----
-let allStocks   = [];
-let filtered    = [];
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let allStocks = [];
+let filteredStocks = [];
+let currentFilter = 'all';
 let currentSort = { key: 'code', dir: 'asc' };
-let activeFilter = 'all';
 
-// ---- DSE API (local backend) ----
-const API_URL = 'http://localhost:3000/api/stocks';
-
-// ---- LOAD DATA ----
-async function loadData() {
-  setLoading(true);
-  setError(null);
-  setRefreshSpinning(true);
-
-  try {
-    const res = await fetch(API_URL);
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || `Server returned HTTP ${res.status}`);
-    }
-
-    const { stocks, count, timestamp, cached, stale } = await res.json();
-
-    if (!stocks || !stocks.length) throw new Error('No stock data returned from server.');
-
-    allStocks = stocks;
-    filtered  = [...stocks];
-
-    applyFilterAndSort();
-    buildTicker(stocks);
-    updateSummary(stocks);
-    updateMeta(count, timestamp, cached, stale);
-
-  } catch (err) {
-    console.error(err);
-    if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-      setError('Cannot reach the local server. Make sure you ran "node server.js" in your terminal first, then refresh this page.');
-    } else {
-      setError(err.message);
-    }
-  } finally {
-    setLoading(false);
-    setRefreshSpinning(false);
-  }
-}
-
-
-
-
-// ---- FILTER & SORT PIPELINE ----
-function applyFilterAndSort() {
-  const q = (document.getElementById('search-input').value || '').toLowerCase();
-
-  // 1. Filter by active category
-  let base = allStocks.filter(s => {
-    if (activeFilter === 'gainer')  return s.change > 0;
-    if (activeFilter === 'loser')   return s.change < 0;
-    if (activeFilter === 'neutral') return s.change === 0;
-    return true;
-  });
-
-  // 2. Search filter
-  if (q) {
-    base = base.filter(s =>
-      s.code.toLowerCase().includes(q) ||
-      s.name.toLowerCase().includes(q)
-    );
-  }
-
-  filtered = base;
-  sortFiltered();
-  renderTable();
-}
-
-function filterTable()  { applyFilterAndSort(); }
-function setFilter(f, btn) {
-  activeFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  applyFilterAndSort();
-}
-
-function sortTable() {
-  const val = document.getElementById('sort-select').value;
-  const [key, dir] = val.split('-');
-  currentSort = { key, dir };
-  sortFiltered();
-  renderTable();
-}
-
-// Column header click sort toggle
-function toggleSort(key) {
-  if (currentSort.key === key) {
-    currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
-  } else {
-    currentSort = { key, dir: 'asc' };
-  }
-  updateSortArrows();
-  sortFiltered();
-  renderTable();
-}
-
-function updateSortArrows() {
-  const cols = ['code','name','ltp','high','low','close','ycp','change','volume'];
-  cols.forEach(c => {
-    const el = document.getElementById('sort-' + c);
-    if (!el) return;
-    if (currentSort.key === c) {
-      el.textContent = currentSort.dir === 'asc' ? ' ↑' : ' ↓';
-    } else {
-      el.textContent = '';
-    }
-  });
-}
-
-function sortFiltered() {
-  const { key, dir } = currentSort;
-  const mult = dir === 'asc' ? 1 : -1;
-
-  filtered.sort((a, b) => {
-    let av = a[key] ?? '', bv = b[key] ?? '';
-    if (typeof av === 'string') return mult * av.localeCompare(bv);
-    return mult * (av - bv);
-  });
-
-  updateSortArrows();
-}
-
-// ---- RENDER TABLE ----
-function renderTable() {
-  const tbody = document.getElementById('stocks-tbody');
-  const table = document.getElementById('stocks-table');
-  const footer = document.getElementById('table-footer');
-
-  table.classList.remove('hidden');
-
-  const fmt = n => n.toLocaleString('en-BD', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
-  const fmtVol = n => {
-    if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M';
-    if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
-    return n.toString();
-  };
-
-  const rows = filtered.map((s, i) => {
-    const chgDir = s.change > 0 ? 'up' : s.change < 0 ? 'dn' : 'fl';
-    const chgSign = s.change > 0 ? '+' : '';
-    const pct = s.ycp ? ((s.change / s.ycp) * 100).toFixed(2) : '0.00';
-    const pctSign = s.change > 0 ? '+' : '';
-
-    const profileUrl = `company.html?code=${encodeURIComponent(s.code)}`;
-    return `
-      <tr>
-        <td class="td-rank">${i + 1}</td>
-        <td class="td-code"><a class="stock-link" href="${profileUrl}">${escHtml(s.code)}</a></td>
-        <td class="td-name" title="${escHtml(s.name)}"><a class="stock-link name-link" href="${profileUrl}">${escHtml(s.name)}</a></td>
-        <td class="td-ltp td-num">৳ ${fmt(s.ltp)}</td>
-        <td class="td-num">${s.high  ? fmt(s.high)  : '—'}</td>
-        <td class="td-num">${s.low   ? fmt(s.low)   : '—'}</td>
-        <td class="td-num">${s.close ? fmt(s.close) : '—'}</td>
-        <td class="td-num">${s.ycp   ? fmt(s.ycp)   : '—'}</td>
-        <td class="td-change ${chgDir}">
-          <span class="change-pill ${chgDir}">
-            ${chgSign}${fmt(s.change)} (${pctSign}${pct}%)
-          </span>
-        </td>
-        <td class="td-num">${fmtVol(s.volume)}</td>
-      </tr>`;
-  }).join('');
-
-  tbody.innerHTML = rows || '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted);font-family:var(--mono)">No results found</td></tr>';
-
-  footer.textContent = `Showing ${filtered.length} of ${allStocks.length} securities`;
-}
-
-// ---- TICKER TAPE ----
-function buildTicker(stocks) {
-  const track = document.getElementById('ticker-track');
-  // Pick a representative sample (all, sorted by volume desc → most active first)
-  const sorted = [...stocks].sort((a, b) => b.volume - a.volume);
-  const items  = [...sorted, ...sorted]; // duplicate for seamless loop
-
-  track.innerHTML = items.map(s => {
-    const dir   = s.change > 0 ? 'up' : s.change < 0 ? 'dn' : 'fl';
-    const sign  = s.change > 0 ? '+' : '';
-    const pct   = s.ycp ? ((s.change / s.ycp) * 100).toFixed(2) : '0.00';
-    return `
-      <span class="ticker-item">
-        <span class="ticker-code">${escHtml(s.code)}</span>
-        <span class="ticker-price">৳${s.ltp.toFixed(1)}</span>
-        <span class="ticker-chg ${dir}">${sign}${s.change.toFixed(1)} (${sign}${pct}%)</span>
-      </span>`;
-  }).join('');
-
-  // Reset animation so it restarts cleanly
-  track.style.animation = 'none';
-  void track.offsetWidth;
-  track.style.animation = '';
-}
-
-// ---- SUMMARY CARDS ----
-function updateSummary(stocks) {
-  const gainers  = stocks.filter(s => s.change > 0);
-  const losers   = stocks.filter(s => s.change < 0);
-  const neutral  = stocks.filter(s => s.change === 0);
-  const sorted   = [...stocks].sort((a, b) => b.ltp - a.ltp);
-  const highest  = sorted[0];
-  const lowest   = sorted[sorted.length - 1];
-
-  document.getElementById('sc-gainers').textContent  = gainers.length;
-  document.getElementById('sc-losers').textContent   = losers.length;
-  document.getElementById('sc-unchanged').textContent = neutral.length;
-  document.getElementById('sc-highest').textContent  = highest ? `${highest.code} ৳${highest.ltp.toLocaleString()}` : '—';
-  document.getElementById('sc-lowest').textContent   = lowest  ? `${lowest.code} ৳${lowest.ltp.toFixed(1)}` : '—';
-}
-
-// ---- METADATA ----
-function updateMeta(count, timestamp, cached, stale) {
-  document.getElementById('total-count').textContent = count;
-
-  const ts = timestamp ? new Date(timestamp) : new Date();
-  let timeStr = ts.toLocaleTimeString('en-BD', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  if (stale)  timeStr += ' (stale)';
-  if (cached) timeStr += ' ✓';
-  document.getElementById('last-updated').textContent = timeStr;
-
-  // Determine market status (DSE: Sun–Thu 10:00–14:30 BST)
-  const bst = new Date(ts.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }));
-  const day = bst.getDay(); // 0=Sun,1=Mon,...,6=Sat
-  const mins = bst.getHours() * 60 + bst.getMinutes();
-  const isWeekday = day >= 0 && day <= 4; // Sun(0) - Thu(4)
-  const inSession = mins >= 600 && mins <= 870; // 10:00–14:30
-
-  const statusEl = document.getElementById('market-status');
-  if (isWeekday && inSession) {
-    statusEl.textContent = '● OPEN';
-    statusEl.style.color = 'var(--gain)';
-  } else {
-    statusEl.textContent = '○ CLOSED';
-    statusEl.style.color = 'var(--loss)';
-  }
-}
-
-// ---- UI HELPERS ----
-function setLoading(on) {
-  document.getElementById('loading-state').classList.toggle('hidden', !on);
-  if (!on && document.getElementById('error-state').classList.contains('hidden')) {
-    document.getElementById('stocks-table').classList.remove('hidden');
-  }
-}
-
-function setError(msg) {
-  const el  = document.getElementById('error-state');
-  const msgEl = document.getElementById('error-msg');
-  if (msg) {
-    el.classList.remove('hidden');
-    document.getElementById('stocks-table').classList.add('hidden');
-    msgEl.textContent = msg;
-  } else {
-    el.classList.add('hidden');
-  }
-}
-
-function setRefreshSpinning(on) {
-  document.getElementById('refresh-btn').classList.toggle('spinning', on);
-}
-
-function escHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-// ---- THEME TOGGLE ----
+// ─── THEME ────────────────────────────────────────────────────────────────────
 function toggleTheme() {
   const html = document.documentElement;
   const isLight = html.getAttribute('data-theme') === 'light';
@@ -290,13 +15,13 @@ function toggleTheme() {
 }
 
 function updateThemeButton(theme) {
-  const icon  = document.getElementById('theme-icon');
+  const icon = document.getElementById('theme-icon');
   const label = document.getElementById('theme-label');
   if (theme === 'light') {
-    icon.textContent  = '🌙';
+    icon.textContent = '🌙';
     label.textContent = 'Dark';
   } else {
-    icon.textContent  = '☀️';
+    icon.textContent = '☀️';
     label.textContent = 'Light';
   }
 }
@@ -309,8 +34,222 @@ function initTheme() {
   updateThemeButton(theme);
 }
 
-// ---- INIT ----
+// ─── MARKET STATUS ────────────────────────────────────────────────────────────
+function setMarketStatus() {
+  const now = new Date();
+  const bst = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }));
+  const day = bst.getDay(); // 0=Sun … 6=Sat
+  const mins = bst.getHours() * 60 + bst.getMinutes();
+  const isWeekday = day >= 0 && day <= 4; // DSE: Sun–Thu
+  const inSession = mins >= 600 && mins <= 870; // 10:00–14:30
+  const el = document.getElementById('market-status');
+  if (isWeekday && inSession) {
+    el.textContent = '● OPEN';
+    el.style.color = 'var(--gain)';
+  } else {
+    el.textContent = '○ CLOSED';
+    el.style.color = 'var(--loss)';
+  }
+}
+
+// ─── LOAD DATA ────────────────────────────────────────────────────────────────
+async function loadData() {
+  document.getElementById('loading-state').classList.remove('hidden');
+  document.getElementById('error-state').classList.add('hidden');
+  document.getElementById('stocks-table').classList.add('hidden');
+  document.getElementById('refresh-btn').disabled = true;
+
+  try {
+    const res = await fetch('http://localhost:3000/api/stocks');
+    if (!res.ok) throw new Error(`Server responded ${res.status}`);
+    const { stocks, timestamp } = await res.json();
+
+    allStocks = stocks;
+    allStocksData = stocks; // expose to watchlist code in index.html
+
+    document.getElementById('last-updated').textContent =
+      new Date(timestamp).toLocaleTimeString('en-BD');
+    document.getElementById('total-count').textContent = stocks.length.toLocaleString();
+
+    buildTicker(stocks);
+    updateSummary(stocks);
+    applyFilterAndSort();
+
+    document.getElementById('loading-state').classList.add('hidden');
+    document.getElementById('stocks-table').classList.remove('hidden');
+  } catch (err) {
+    document.getElementById('loading-state').classList.add('hidden');
+    document.getElementById('error-state').classList.remove('hidden');
+    document.getElementById('error-msg').textContent = 'Error: ' + err.message;
+  } finally {
+    document.getElementById('refresh-btn').disabled = false;
+  }
+}
+
+// ─── TICKER ───────────────────────────────────────────────────────────────────
+function buildTicker(stocks) {
+  const track = document.getElementById('ticker-track');
+  const notable = stocks.filter(s => Math.abs(s.change) > 0).slice(0, 40);
+  if (!notable.length) { track.textContent = 'No market movement data'; return; }
+
+  const items = notable.map(s => {
+    const dir = s.change > 0 ? 'up' : 'dn';
+    const sign = s.change > 0 ? '▲' : '▼';
+    return `<span class="ticker-item ${dir}"><strong>${s.code}</strong> ৳${s.ltp.toFixed(1)} <em>${sign}${Math.abs(s.change).toFixed(1)}</em></span>`;
+  }).join('');
+
+  track.innerHTML = items + items; // duplicate for seamless loop
+}
+
+// ─── SUMMARY ──────────────────────────────────────────────────────────────────
+function updateSummary(stocks) {
+  const gainers = stocks.filter(s => s.change > 0).length;
+  const losers  = stocks.filter(s => s.change < 0).length;
+  const neutral = stocks.filter(s => s.change === 0).length;
+  const prices  = stocks.map(s => s.ltp).filter(Boolean);
+  const highest = Math.max(...prices);
+  const lowest  = Math.min(...prices);
+
+  document.getElementById('sc-gainers').textContent   = gainers;
+  document.getElementById('sc-losers').textContent    = losers;
+  document.getElementById('sc-unchanged').textContent = neutral;
+  document.getElementById('sc-highest').textContent   = highest ? '৳' + highest.toFixed(1) : '—';
+  document.getElementById('sc-lowest').textContent    = lowest  ? '৳' + lowest.toFixed(1)  : '—';
+}
+
+// ─── FILTER ───────────────────────────────────────────────────────────────────
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilterAndSort();
+}
+
+function filterTable() {
+  applyFilterAndSort();
+}
+
+function applyFilterAndSort() {
+  const query = (document.getElementById('search-input').value || '').toLowerCase();
+
+  filteredStocks = allStocks.filter(s => {
+    const matchSearch = !query || s.code.toLowerCase().includes(query) || s.name.toLowerCase().includes(query);
+    const matchFilter =
+      currentFilter === 'all'     ? true :
+      currentFilter === 'gainer'  ? s.change > 0 :
+      currentFilter === 'loser'   ? s.change < 0 :
+      currentFilter === 'neutral' ? s.change === 0 : true;
+    return matchSearch && matchFilter;
+  });
+
+  sortStocks(filteredStocks);
+  renderTable(filteredStocks);
+}
+
+// ─── SORT ─────────────────────────────────────────────────────────────────────
+function toggleSort(key) {
+  if (currentSort.key === key) {
+    currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    currentSort.key = key;
+    currentSort.dir = 'asc';
+  }
+  updateSortArrows();
+  applyFilterAndSort();
+}
+
+function sortTable() {
+  const val = document.getElementById('sort-select').value;
+  const [key, dir] = val.split('-');
+  currentSort = { key, dir };
+  applyFilterAndSort();
+}
+
+function sortStocks(arr) {
+  const { key, dir } = currentSort;
+  arr.sort((a, b) => {
+    let av = a[key], bv = b[key];
+    if (typeof av === 'string') av = av.toLowerCase();
+    if (typeof bv === 'string') bv = bv.toLowerCase();
+    if (av < bv) return dir === 'asc' ? -1 : 1;
+    if (av > bv) return dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
+function updateSortArrows() {
+  ['code','name','ltp','high','low','close','ycp','change','volume'].forEach(k => {
+    const el = document.getElementById('sort-' + k);
+    if (!el) return;
+    el.textContent = currentSort.key === k ? (currentSort.dir === 'asc' ? '↑' : '↓') : '';
+  });
+}
+
+// ─── RENDER TABLE ─────────────────────────────────────────────────────────────
+function fmt(n) {
+  return n ? n.toLocaleString('en-BD', { minimumFractionDigits: 1, maximumFractionDigits: 2 }) : '—';
+}
+function fmtVol(n) {
+  if (!n) return '—';
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M';
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  return n.toLocaleString();
+}
+
+function renderTable(stocks) {
+  const tbody = document.getElementById('stocks-tbody');
+  const footer = document.getElementById('table-footer');
+
+  if (!stocks.length) {
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--text-muted);font-family:var(--mono);font-size:12px;">No results found</td></tr>`;
+    footer.textContent = '';
+    return;
+  }
+
+  tbody.innerHTML = stocks.map((s, i) => {
+    const dir = s.change > 0 ? 'up' : s.change < 0 ? 'dn' : '';
+    const sign = s.change > 0 ? '+' : '';
+    const pct = s.ycp ? ((s.change / s.ycp) * 100).toFixed(2) : '0.00';
+    // NOTE: no fav-cell td here — injectFavCells() adds it after render
+    return `<tr data-code="${s.code}" data-name="${escAttrApp(s.name)}" onclick="goToCompany(event,'${escAttrApp(s.code)}')" style="cursor:pointer">
+      <td class="th-rank">${i + 1}</td>
+      <td class="th-code"><strong>${s.code}</strong></td>
+      <td>${s.name}</td>
+      <td class="th-num">৳${fmt(s.ltp)}</td>
+      <td class="th-num">${s.high ? '৳' + fmt(s.high) : '—'}</td>
+      <td class="th-num">${s.low ? '৳' + fmt(s.low) : '—'}</td>
+      <td class="th-num">${s.close ? '৳' + fmt(s.close) : '—'}</td>
+      <td class="th-num">${s.ycp ? '৳' + fmt(s.ycp) : '—'}</td>
+      <td class="th-num ${dir}">${sign}${fmt(s.change)} <small>(${sign}${pct}%)</small></td>
+      <td class="th-num">${fmtVol(s.volume)}</td>
+    </tr>`;
+  }).join('');
+
+  // Inject fav buttons (defined in index.html inline script)
+  if (typeof injectFavCells === 'function') injectFavCells();
+
+  footer.textContent = `Showing ${stocks.length} of ${allStocks.length} securities`;
+}
+
+function goToCompany(event, code) {
+  // Don't navigate if click was on fav cell
+  if (event.target.closest('.fav-cell')) return;
+  window.location.href = `/company.html?code=${encodeURIComponent(code)}`;
+}
+
+function escAttrApp(s) {
+  return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
+  setMarketStatus();
   loadData();
+
+  // Auto-refresh every 5 minutes
+  setInterval(() => {
+    loadData();
+    setMarketStatus();
+  }, 5 * 60 * 1000);
 });
