@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Company Profile — DSE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ---- COMPANY PAGE SPECIFIC ---- */
+    .profile-header {
+      max-width: 1100px;
+      margin: 32px auto 0;
+      padding: 0 24px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--border-glow);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      margin-bottom: 24px;
+    }
+
+    .back-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .back-btn svg { width: 14px; height: 14px; }
+
+    .company-hero {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .company-identity { flex: 1; min-width: 200px; }
+
+    .company-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
+    }
+
+    .company-fullname {
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.4px;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    .company-code-line {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .company-price-block {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .price-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .price-big {
+      font-family: var(--mono);
+      font-size: 38px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .price-change-big {
+      font-family: var(--mono);
+      font-size: 16px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+    }
+
+    .price-change-big.up { background: var(--gain-bg); color: var(--gain); }
+    .price-change-big.dn { background: var(--loss-bg); color: var(--loss); }
+    .price-change-big.fl { background: var(--neutral-bg); color: var(--neutral); }
+
+    /* ---- STATS GRID ---- */
+    .stats-grid {
+      max-width: 1100px;
+      margin: 0 auto 20px;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      transition: border-color 0.2s;
+    }
+
+    .stat-card:hover { border-color: var(--border-glow); }
+
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .stat-value.gain { color: var(--gain); }
+    .stat-value.loss { color: var(--loss); }
+
+    /* ---- PRICE BAR ---- */
+    .range-section {
+      max-width: 1100px;
+      margin: 0 auto 20px;
+      padding: 0 24px;
+    }
+
+    .range-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px 28px;
+    }
+
+    .range-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .range-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .range-end {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      min-width: 60px;
+    }
+
+    .range-end.right { text-align: right; }
+
+    .range-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      position: relative;
+    }
+
+    .range-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--loss), var(--gain));
+      border-radius: 3px;
+      transition: width 0.8s ease;
+    }
+
+    .range-dot {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      border: 2px solid var(--bg-card);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-glow);
+      transition: left 0.8s ease;
+    }
+
+    /* ---- DETAIL TABLE ---- */
+    .detail-section {
+      max-width: 1100px;
+      margin: 0 auto 60px;
+      padding: 0 24px;
+    }
+
+    .detail-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .detail-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .detail-table tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-table tr:last-child { border-bottom: none; }
+
+    .detail-table td {
+      padding: 14px 20px;
+      color: var(--text-secondary);
+    }
+
+    .detail-table td:first-child {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      width: 40%;
+    }
+
+    .detail-table td:last-child {
+      color: var(--text-primary);
+      font-weight: 700;
+      text-align: right;
+    }
+
+    /* ---- DSE LINK ---- */
+    .dse-link-section {
+      max-width: 1100px;
+      margin: 0 auto 20px;
+      padding: 0 24px;
+    }
+
+    .dse-link-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .dse-link-text {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .dse-link-text strong { color: var(--text-secondary); }
+
+    .dse-ext-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: var(--radius-sm);
+      font-family: var(--mono);
+      font-size: 11px;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+    }
+
+    .dse-ext-link:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .dse-ext-link svg { width: 12px; height: 12px; }
+
+    /* ---- LOADING / ERROR ---- */
+    .profile-loading {
+      max-width: 1100px;
+      margin: 80px auto;
+      padding: 0 24px;
+      text-align: center;
+      font-family: var(--mono);
+      color: var(--text-muted);
+    }
+
+    .profile-spinner {
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .company-hero { flex-direction: column; }
+      .company-price-block { text-align: left; }
+      .price-big { font-size: 28px; }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .company-fullname { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo-block">
+        <span class="logo-tag">DSE</span>
+        <div class="logo-text">
+          <h1>Company Profile</h1>
+          <p>Dhaka Stock Exchange — Security Detail</p>
+        </div>
+      </div>
+      <div class="header-meta">
+        <div class="meta-item">
+          <span class="meta-label">STATUS</span>
+          <span class="meta-value" id="market-status">—</span>
+        </div>
+        <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle light/dark mode">
+          <span class="toggle-icon" id="theme-icon">☀️</span>
+          <span id="theme-label">Light</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- PROFILE CONTENT -->
+  <div class="profile-header">
+    <a href="/" class="back-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Back to Market
+    </a>
+  </div>
+
+  <!-- LOADING STATE -->
+  <div id="profile-loading" class="profile-loading">
+    <div class="profile-spinner"></div>
+    <p>Loading company data…</p>
+  </div>
+
+  <!-- PROFILE BODY (hidden until loaded) -->
+  <div id="profile-body" style="display:none">
+
+    <!-- HERO -->
+    <div class="profile-header">
+      <div class="company-hero">
+        <div class="company-identity">
+          <div class="company-badge" id="p-code">—</div>
+          <div class="company-fullname" id="p-name">—</div>
+          <div class="company-code-line">Trading Code: <span id="p-code2">—</span> · Dhaka Stock Exchange</div>
+        </div>
+        <div class="company-price-block">
+          <div class="price-label">Last Traded Price</div>
+          <div class="price-big" id="p-ltp">—</div>
+          <span class="price-change-big" id="p-change">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS GRID -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Today's High</div>
+        <div class="stat-value" id="p-high">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Today's Low</div>
+        <div class="stat-value" id="p-low">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Close Price</div>
+        <div class="stat-value" id="p-close">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Volume</div>
+        <div class="stat-value" id="p-volume">—</div>
+      </div>
+    </div>
+
+    <!-- INTRADAY RANGE BAR -->
+    <div class="range-section">
+      <div class="range-card">
+        <div class="range-title">Intraday Price Range</div>
+        <div class="range-bar-wrap">
+          <div class="range-end" id="p-range-low">—</div>
+          <div class="range-bar">
+            <div class="range-fill" id="p-range-fill"></div>
+            <div class="range-dot" id="p-range-dot"></div>
+          </div>
+          <div class="range-end right" id="p-range-high">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DSE LINK -->
+    <div class="dse-link-section">
+      <div class="dse-link-card">
+        <div class="dse-link-text">View full details, financials, and announcements on <strong>dsebd.org</strong></div>
+        <a id="p-dse-link" href="#" target="_blank" class="dse-ext-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          View on DSE
+        </a>
+      </div>
+    </div>
+
+    <!-- DETAIL TABLE -->
+    <div class="detail-section">
+      <div class="detail-card">
+        <table class="detail-table">
+          <tr><td>Trading Code</td><td id="d-code">—</td></tr>
+          <tr><td>Company Name</td><td id="d-name">—</td></tr>
+          <tr><td>Last Traded Price (LTP)</td><td id="d-ltp">—</td></tr>
+          <tr><td>Yesterday's Close Price (YCP)</td><td id="d-ycp">—</td></tr>
+          <tr><td>Change</td><td id="d-change">—</td></tr>
+          <tr><td>Today's High</td><td id="d-high">—</td></tr>
+          <tr><td>Today's Low</td><td id="d-low">—</td></tr>
+          <tr><td>Close Price</td><td id="d-close">—</td></tr>
+          <tr><td>Volume</td><td id="d-volume">—</td></tr>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end #profile-body -->
+
+  <footer class="site-footer">
+    <p>Data sourced from <strong>dsebd.org</strong> · Prices in BDT (Taka) · For informational purposes only</p>
+  </footer>
+
+  <script>
+    // ---- THEME ----
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isLight = html.getAttribute('data-theme') === 'light';
+      const newTheme = isLight ? 'dark' : 'light';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('dse-theme', newTheme);
+      updateThemeButton(newTheme);
+    }
+
+    function updateThemeButton(theme) {
+      const icon  = document.getElementById('theme-icon');
+      const label = document.getElementById('theme-label');
+      if (theme === 'light') {
+        icon.textContent  = '🌙';
+        label.textContent = 'Dark';
+      } else {
+        icon.textContent  = '☀️';
+        label.textContent = 'Light';
+      }
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem('dse-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = saved || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+      updateThemeButton(theme);
+    }
+
+    // ---- MARKET STATUS ----
+    function setMarketStatus() {
+      const now = new Date();
+      const bst = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }));
+      const day = bst.getDay();
+      const mins = bst.getHours() * 60 + bst.getMinutes();
+      const isWeekday = day >= 0 && day <= 4;
+      const inSession = mins >= 600 && mins <= 870;
+      const el = document.getElementById('market-status');
+      if (isWeekday && inSession) {
+        el.textContent = '● OPEN';
+        el.style.color = 'var(--gain)';
+      } else {
+        el.textContent = '○ CLOSED';
+        el.style.color = 'var(--loss)';
+      }
+    }
+
+    // ---- LOAD PROFILE ----
+    async function loadProfile() {
+      const params = new URLSearchParams(window.location.search);
+      const code   = params.get('code');
+
+      if (!code) {
+        document.getElementById('profile-loading').innerHTML =
+          '<p style="color:var(--loss)">No company code specified. <a href="/" style="color:var(--accent)">Go back</a></p>';
+        return;
+      }
+
+      document.title = `${code} — DSE Company Profile`;
+
+      try {
+        const res  = await fetch('http://localhost:3000/api/stocks');
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+        const { stocks, timestamp } = await res.json();
+
+        const s = stocks.find(x => x.code === code.toUpperCase());
+
+        if (!s) {
+          document.getElementById('profile-loading').innerHTML =
+            `<p style="color:var(--loss)">Company "<strong>${code}</strong>" not found. <a href="/" style="color:var(--accent)">Go back</a></p>`;
+          return;
+        }
+
+        populateProfile(s, timestamp);
+
+        document.getElementById('profile-loading').style.display = 'none';
+        document.getElementById('profile-body').style.display    = 'block';
+
+      } catch (err) {
+        document.getElementById('profile-loading').innerHTML =
+          `<p style="color:var(--loss)">Failed to load data: ${err.message}<br><br><a href="/" style="color:var(--accent)">← Go back to Market</a></p>`;
+      }
+    }
+
+    function populateProfile(s, timestamp) {
+      const fmt    = n => n.toLocaleString('en-BD', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+      const fmtVol = n => {
+        if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M';
+        if (n >= 1_000)     return (n / 1_000).toFixed(1) + 'K';
+        return n.toLocaleString();
+      };
+
+      const chgDir  = s.change > 0 ? 'up' : s.change < 0 ? 'dn' : 'fl';
+      const chgSign = s.change > 0 ? '+' : '';
+      const pct     = s.ycp ? ((s.change / s.ycp) * 100).toFixed(2) : '0.00';
+
+      // Hero
+      document.getElementById('p-code').textContent  = s.code;
+      document.getElementById('p-code2').textContent = s.code;
+      document.getElementById('p-name').textContent  = s.name;
+      document.getElementById('p-ltp').textContent   = '৳ ' + fmt(s.ltp);
+
+      const chgEl = document.getElementById('p-change');
+      chgEl.textContent = `${chgSign}${fmt(s.change)} (${chgSign}${pct}%)`;
+      chgEl.className   = `price-change-big ${chgDir}`;
+
+      // Stats
+      document.getElementById('p-high').textContent   = s.high  ? '৳ ' + fmt(s.high)  : '—';
+      document.getElementById('p-low').textContent    = s.low   ? '৳ ' + fmt(s.low)   : '—';
+      document.getElementById('p-close').textContent  = s.close ? '৳ ' + fmt(s.close) : '—';
+      document.getElementById('p-volume').textContent = fmtVol(s.volume);
+
+      // Range bar
+      if (s.high && s.low && s.high !== s.low) {
+        const pct = ((s.ltp - s.low) / (s.high - s.low)) * 100;
+        document.getElementById('p-range-low').textContent  = '৳ ' + fmt(s.low);
+        document.getElementById('p-range-high').textContent = '৳ ' + fmt(s.high);
+        setTimeout(() => {
+          document.getElementById('p-range-fill').style.width = pct + '%';
+          document.getElementById('p-range-dot').style.left   = pct + '%';
+        }, 100);
+      }
+
+      // DSE external link
+      document.getElementById('p-dse-link').href =
+        `https://www.dsebd.org/displayCompany.php?name=${encodeURIComponent(s.code)}`;
+
+      // Detail table
+      document.getElementById('d-code').textContent   = s.code;
+      document.getElementById('d-name').textContent   = s.name;
+      document.getElementById('d-ltp').textContent    = '৳ ' + fmt(s.ltp);
+      document.getElementById('d-ycp').textContent    = s.ycp   ? '৳ ' + fmt(s.ycp)   : '—';
+      document.getElementById('d-high').textContent   = s.high  ? '৳ ' + fmt(s.high)  : '—';
+      document.getElementById('d-low').textContent    = s.low   ? '৳ ' + fmt(s.low)   : '—';
+      document.getElementById('d-close').textContent  = s.close ? '৳ ' + fmt(s.close) : '—';
+      document.getElementById('d-volume').textContent = fmtVol(s.volume);
+
+      const dChgEl = document.getElementById('d-change');
+      dChgEl.textContent = `${chgSign}${fmt(s.change)} (${chgSign}${pct}%)`;
+      dChgEl.style.color = chgDir === 'up' ? 'var(--gain)' : chgDir === 'dn' ? 'var(--loss)' : 'var(--neutral)';
+    }
+
+    // ---- INIT ----
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      setMarketStatus();
+      loadProfile();
+    });
+  </script>
+</body>
+</html>

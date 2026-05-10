@@ -154,11 +154,12 @@ function renderTable() {
     const pct = s.ycp ? ((s.change / s.ycp) * 100).toFixed(2) : '0.00';
     const pctSign = s.change > 0 ? '+' : '';
 
+    const profileUrl = `company.html?code=${encodeURIComponent(s.code)}`;
     return `
       <tr>
         <td class="td-rank">${i + 1}</td>
-        <td class="td-code">${escHtml(s.code)}</td>
-        <td class="td-name" title="${escHtml(s.name)}">${escHtml(s.name)}</td>
+        <td class="td-code"><a class="stock-link" href="${profileUrl}">${escHtml(s.code)}</a></td>
+        <td class="td-name" title="${escHtml(s.name)}"><a class="stock-link name-link" href="${profileUrl}">${escHtml(s.name)}</a></td>
         <td class="td-ltp td-num">৳ ${fmt(s.ltp)}</td>
         <td class="td-num">${s.high  ? fmt(s.high)  : '—'}</td>
         <td class="td-num">${s.low   ? fmt(s.low)   : '—'}</td>

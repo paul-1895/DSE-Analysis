@@ -16,7 +16,14 @@ const app  = express();
 const PORT = 3000;
 
 app.use(cors());
-app.use(express.static(__dirname)); // serve index.html, style.css, app.js
+// Disable caching for static files so changes are picked up immediately
+app.use(express.static(__dirname, {
+  etag: false,
+  lastModified: false,
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  }
+}));
 
 // ── Cache to avoid hammering DSE (30-second TTL) ────────────────────────────
 let cache = { data: null, ts: 0 };
