@@ -155,6 +155,149 @@ app.get('/api/stocks', async (req, res) => {
   }
 });
 
+// ============================================================
+// NEWS API ROUTES — Add these to your server.js
+// Place BEFORE your app.listen() call
+// ============================================================
+
+// Required: add these requires at the top of server.js
+// const path = require('path');
+// const fs   = require('fs');
+
+// ---- helpers -----------------------------------------------
+
+const NEWS_DIR = path.join(__dirname, 'news');
+
+// Ensure news directory exists
+if (!fs.existsSync(NEWS_DIR)) fs.mkdirSync(NEWS_DIR);
+
+function newsFilePath(code) {
+  // Sanitise code so it can safely be a filename
+  const safe = code.replace(/[^A-Za-z0-9_-]/g, '').toUpperCase();
+  return path.join(NEWS_DIR, `${safe}.json`);
+}
+
+function readNews(code) {
+  const fp = newsFilePath(code);
+  if (!fs.existsSync(fp)) return [];
+  try { return JSON.parse(fs.readFileSync(fp, 'utf8')); }
+  catch { return []; }
+}
+
+function writeNews(code, items) {
+  fs.writeFileSync(newsFilePath(code), JSON.stringify(items, null, 2), 'utf8');
+}
+
+// ---- fetch Open-Graph / meta preview -----------------------
+
+const https = require('https');
+const http  = require('http');
+
+function fetchPreview(url) {
+  return new Promise((resolve) => {
+    const timeout = setTimeout(() => resolve(null), 8000);
+
+    const client = url.startsWith('https') ? https : http;
+    client.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (DSE-Analysis link-preview bot)' } }, (res) => {
+      // Follow one redirect
+      if ((res.statusCode === 301 || res.statusCode === 302) && res.headers.location) {
+        clearTimeout(timeout);
+        return fetchPreview(res.headers.location).then(resolve);
+      }
+
+      let html = '';
+      res.setEncoding('utf8');
+      res.on('data', chunk => {
+        html += chunk;
+        if (html.length > 200_000) res.destroy(); // don't download megabytes
+      });
+      res.on('end', () => {
+        clearTimeout(timeout);
+        const extract = (pattern) => { const m = html.match(pattern); return m ? m[1].trim() : null; };
+
+        const title =
+          extract(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i) ||
+          extract(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i) ||
+          extract(/<title[^>]*>([^<]+)<\/title>/i) ||
+          null;
+
+        const description =
+          extract(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i) ||
+          extract(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i) ||
+          extract(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i) ||
+          extract(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i) ||
+          null;
+
+        const image =
+          extract(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+          extract(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i) ||
+          null;
+
+        const siteName =
+          extract(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']+)["']/i) ||
+          extract(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:site_name["']/i) ||
+          null;
+
+        resolve({ title, description, image, siteName });
+      });
+      res.on('error', () => { clearTimeout(timeout); resolve(null); });
+    }).on('error', () => { clearTimeout(timeout); resolve(null); });
+  });
+}
+
+// ---- routes ------------------------------------------------
+
+// GET  /api/news/:code          → list all news for a stock
+app.get('/api/news/:code', (req, res) => {
+  const items = readNews(req.params.code);
+  res.json({ items });
+});
+
+// POST /api/news/:code          → add a news link
+// Body: { url: "https://..." }
+app.post('/api/news/:code', express.json(), async (req, res) => {
+  const { code } = req.params;
+  const { url }  = req.body || {};
+
+  if (!url || !/^https?:\/\//i.test(url)) {
+    return res.status(400).json({ error: 'Invalid URL' });
+  }
+
+  const items = readNews(code);
+
+  // Duplicate guard
+  if (items.some(i => i.url === url)) {
+    return res.status(409).json({ error: 'URL already saved' });
+  }
+
+  const preview = await fetchPreview(url);
+
+  const item = {
+    id:        Date.now().toString(),
+    url,
+    addedAt:   new Date().toISOString(),
+    title:     preview?.title       || null,
+    description: preview?.description || null,
+    image:     preview?.image       || null,
+    siteName:  preview?.siteName    || null,
+  };
+
+  items.unshift(item);   // newest first
+  writeNews(code, items);
+  res.json({ item });
+});
+
+// DELETE /api/news/:code/:id    → remove one link by id
+app.delete('/api/news/:code/:id', (req, res) => {
+  const { code, id } = req.params;
+  let items = readNews(code);
+  const before = items.length;
+  items = items.filter(i => i.id !== id);
+  if (items.length === before) return res.status(404).json({ error: 'Not found' });
+  writeNews(code, items);
+  res.json({ ok: true });
+});
+
 app.listen(PORT, () => {
   console.log(`DSE server running on http://localhost:${PORT}`);
   console.log(`Watchlist stored at: ${WATCHLIST_FILE}`);
