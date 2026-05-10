@@ -278,6 +278,57 @@
       text-align: right;
     }
 
+    /* ---- TRADINGVIEW CHART ---- */
+    .chart-section {
+      max-width: 1100px;
+      margin: 0 auto 20px;
+      padding: 0 24px;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chart-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .chart-note {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .chart-note a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .chart-note a:hover { text-decoration: underline; }
+
+    #tv-chart-container {
+      width: 100%;
+      height: 520px;
+      min-height: 520px;
+    }
+
     /* ---- DSE LINK ---- */
     .dse-link-section {
       max-width: 1100px;
@@ -459,6 +510,20 @@
       </div>
     </div>
 
+    <!-- TRADINGVIEW CHART -->
+    <div class="chart-section">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">📈 Price Chart — TradingView</div>
+          <div class="chart-note">
+            Powered by <a href="https://www.tradingview.com" target="_blank">TradingView</a> ·
+            Symbol: <span id="tv-symbol-label">DSE:—</span>
+          </div>
+        </div>
+        <div id="tv-chart-container"></div>
+      </div>
+    </div>
+
     <!-- DSE LINK -->
     <div class="dse-link-section">
       <div class="dse-link-card">
@@ -499,6 +564,8 @@
 
   <script>
     // ---- THEME ----
+    let currentStockCode = null;
+
     function toggleTheme() {
       const html = document.documentElement;
       const isLight = html.getAttribute('data-theme') === 'light';
@@ -506,6 +573,8 @@
       html.setAttribute('data-theme', newTheme);
       localStorage.setItem('dse-theme', newTheme);
       updateThemeButton(newTheme);
+      // Reload chart with new theme
+      if (currentStockCode) loadTradingViewChart(currentStockCode);
     }
 
     function updateThemeButton(theme) {
@@ -583,6 +652,55 @@
       }
     }
 
+    // ---- TRADINGVIEW CHART ----
+    function loadTradingViewChart(code) {
+      const theme     = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      const symbol    = `DSEBD:${code}`;
+      const container = document.getElementById('tv-chart-container');
+
+      document.getElementById('tv-symbol-label').textContent = symbol;
+
+      // Build config object
+      const config = {
+        autosize:           true,
+        symbol:             symbol,
+        interval:           'D',
+        timezone:           'Asia/Dhaka',
+        theme:              theme,
+        style:              '1',
+        locale:             'en',
+        backgroundColor:    theme === 'dark' ? '#161b24' : '#ffffff',
+        gridColor:          theme === 'dark' ? 'rgba(31,39,53,0.6)' : 'rgba(208,217,230,0.5)',
+        withdateranges:     true,
+        range:              '12M',
+        hide_side_toolbar:  false,
+        allow_symbol_change:false,
+        save_image:         false,
+        calendar:           false,
+        studies:            ['MASimple@tv-basicstudies', 'Volume@tv-basicstudies'],
+        support_host:       'https://www.tradingview.com',
+      };
+
+      // TradingView requires this exact DOM structure + fresh script tag each time
+      container.innerHTML = `
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+          <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
+          <div class="tradingview-widget-copyright">
+            <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
+              <span style="font-family:monospace;font-size:10px;color:var(--text-muted)">Track all markets on TradingView</span>
+            </a>
+          </div>
+        </div>`;
+
+      const script  = document.createElement('script');
+      script.type   = 'text/javascript';
+      script.src    = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+      script.async  = true;
+      script.textContent = JSON.stringify(config);
+
+      container.querySelector('.tradingview-widget-container').appendChild(script);
+    }
+
     function populateProfile(s, timestamp) {
       const fmt    = n => n.toLocaleString('en-BD', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
       const fmtVol = n => {
@@ -639,6 +757,10 @@
       const dChgEl = document.getElementById('d-change');
       dChgEl.textContent = `${chgSign}${fmt(s.change)} (${chgSign}${pct}%)`;
       dChgEl.style.color = chgDir === 'up' ? 'var(--gain)' : chgDir === 'dn' ? 'var(--loss)' : 'var(--neutral)';
+
+      // Load TradingView chart
+      currentStockCode = s.code;
+      loadTradingViewChart(s.code);
     }
 
     // ---- INIT ----
