@@ -1,0 +1,27 @@
+{
+  "portfolios": [
+    {
+      "id": "1778452761923",
+      "name": "Paul HRSL",
+      "code": "52",
+      "type": "CASH",
+      "broker": "HRSL",
+      "stocks": [
+        {
+          "id": "1778453661578",
+          "code": "TRUSTBANK",
+          "company": "15.9",
+          "qty": 2537,
+          "saleQty": 0,
+          "cost": 18.44,
+          "mktPrice": 16.2,
+          "sector": "OTHER",
+          "lock": 0,
+          "addedAt": "2026-05-10T22:54:21.578Z"
+        }
+      ],
+      "dividends": [],
+      "createdAt": "2026-05-10T22:39:21.923Z"
+    }
+  ]
+}

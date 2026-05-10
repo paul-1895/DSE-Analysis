@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
-  /* ── Design Tokens ─────────────────────────────────────── */
   :root {
     --bg:        #0d1117;
     --surface:   #161b22;
@@ -26,78 +25,30 @@
     --radius:    6px;
     --shadow:    0 4px 24px rgba(0,0,0,.5);
   }
-
-  /* ── Reset ─────────────────────────────────────────────── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-sans);
-    font-size: 14px;
-    min-height: 100vh;
-  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 14px; min-height: 100vh; }
   a { color: var(--accent); text-decoration: none; }
 
-  /* ── Header ─────────────────────────────────────────────── */
-  .site-header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    position: sticky; top: 0; z-index: 100;
-  }
-  .header-inner {
-    max-width: 1400px; margin: 0 auto;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 24px; gap: 16px; flex-wrap: wrap;
-  }
+  .site-header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  .header-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; gap: 16px; flex-wrap: wrap; }
   .logo-block { display: flex; align-items: center; gap: 12px; }
-  .logo-tag {
-    font-family: var(--font-mono);
-    background: var(--accent);
-    color: #000;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 8px;
-    border-radius: 3px;
-    letter-spacing: 1px;
-  }
+  .logo-tag { font-family: var(--font-mono); background: var(--accent); color: #000; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 3px; letter-spacing: 1px; }
   .logo-text h1 { font-size: 16px; font-weight: 600; line-height: 1.2; }
   .logo-text p  { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
   .nav-links { display: flex; gap: 8px; }
-  .nav-links a {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--muted);
-    padding: 6px 12px;
-    border-radius: var(--radius);
-    border: 1px solid transparent;
-    transition: all .2s;
-  }
-  .nav-links a:hover, .nav-links a.active {
-    color: var(--text);
-    border-color: var(--border);
-    background: var(--surface2);
-  }
+  .nav-links a { font-family: var(--font-mono); font-size: 11px; color: var(--muted); padding: 6px 12px; border-radius: var(--radius); border: 1px solid transparent; transition: all .2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--text); border-color: var(--border); background: var(--surface2); }
 
-  /* ── Page Layout ────────────────────────────────────────── */
   .page { max-width: 1400px; margin: 0 auto; padding: 24px; }
+  .page-loading { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 60px; color: var(--muted); font-family: var(--font-mono); font-size: 12px; }
+  .spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── Section Header ─────────────────────────────────────── */
-  .section-hd {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
-  }
+  .section-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
   .section-hd h2 { font-family: var(--font-mono); font-size: 13px; letter-spacing: .05em; color: var(--muted); }
   .section-hd h2 span { color: var(--text); }
 
-  /* ── Buttons ─────────────────────────────────────────────── */
-  .btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 7px 14px; border-radius: var(--radius);
-    font-family: var(--font-mono); font-size: 11px; font-weight: 700;
-    cursor: pointer; transition: all .15s; border: 1px solid transparent;
-    letter-spacing: .04em;
-  }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius); font-family: var(--font-mono); font-size: 11px; font-weight: 700; cursor: pointer; transition: all .15s; border: 1px solid transparent; letter-spacing: .04em; }
   .btn-primary { background: var(--accent); color: #000; }
   .btn-primary:hover { background: #79c0ff; }
   .btn-danger  { background: transparent; color: var(--loss); border-color: var(--loss); }
@@ -108,141 +59,51 @@
   .btn-gain:hover    { background: rgba(57,211,83,.1); }
   .btn-sm { padding: 4px 10px; font-size: 10px; }
   .btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
 
-  /* ── Portfolio Grid ─────────────────────────────────────── */
-  .portfolio-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-    margin-bottom: 32px;
-  }
-  .portfolio-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 18px;
-    cursor: pointer;
-    transition: border-color .2s, transform .1s;
-    position: relative;
-  }
+  .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .portfolio-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 18px; cursor: pointer; transition: border-color .2s; position: relative; }
   .portfolio-card:hover { border-color: var(--accent); }
   .portfolio-card.active { border-color: var(--accent); background: var(--surface2); }
-  .portfolio-card.active::after {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    border-radius: 8px;
-    box-shadow: inset 0 0 0 1px var(--accent);
-    pointer-events: none;
-  }
-  .pc-name {
-    font-family: var(--font-mono); font-size: 13px; font-weight: 700;
-    margin-bottom: 4px; color: var(--text);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
+  .portfolio-card.active::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--accent); pointer-events: none; }
+  .pc-name { font-family: var(--font-mono); font-size: 13px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .pc-meta { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
   .pc-stats { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
   .pc-stat { display: flex; justify-content: space-between; font-size: 12px; }
   .pc-stat .lbl { color: var(--muted); }
   .pc-stat .val { font-family: var(--font-mono); font-weight: 700; }
   .pc-actions { display: flex; gap: 6px; }
-  .add-portfolio-card {
-    background: var(--surface);
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 8px; cursor: pointer; min-height: 160px;
-    color: var(--muted); font-family: var(--font-mono); font-size: 12px;
-    transition: border-color .2s, color .2s;
-  }
+  .add-portfolio-card { background: var(--surface); border: 1px dashed var(--border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; min-height: 160px; color: var(--muted); font-family: var(--font-mono); font-size: 12px; transition: border-color .2s, color .2s; }
   .add-portfolio-card:hover { border-color: var(--accent); color: var(--accent); }
   .add-portfolio-card svg { width: 28px; height: 28px; }
-  .empty-state {
-    text-align: center; padding: 60px 20px;
-    color: var(--muted); font-family: var(--font-mono); font-size: 12px;
-  }
-  .empty-state svg { width: 40px; height: 40px; margin-bottom: 12px; opacity: .4; }
 
-  /* ── Divider ─────────────────────────────────────────────── */
   .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
 
-  /* ── Stocks Panel ───────────────────────────────────────── */
-  .stocks-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .stocks-panel-hd {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 18px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px;
-  }
-  .stocks-panel-hd h3 {
-    font-family: var(--font-mono); font-size: 13px; font-weight: 700;
-  }
-  .stocks-panel-hd .hd-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .search-inline {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 6px 10px;
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    width: 180px;
-    outline: none;
-    transition: border-color .2s;
-  }
-  .search-inline:focus { border-color: var(--accent); }
-  .search-inline::placeholder { color: var(--muted); }
-
-  /* ── Summary Bar ─────────────────────────────────────────── */
-  .summary-bar {
-    display: flex; gap: 0;
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-  }
-  .sb-item {
-    flex: 1; min-width: 130px;
-    padding: 12px 18px;
-    border-right: 1px solid var(--border);
-  }
+  .summary-bar { display: flex; border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .sb-item { flex: 1; min-width: 130px; padding: 12px 18px; border-right: 1px solid var(--border); }
   .sb-item:last-child { border-right: none; }
   .sb-lbl { font-size: 10px; color: var(--muted); font-family: var(--font-mono); letter-spacing: .05em; margin-bottom: 4px; }
   .sb-val { font-family: var(--font-mono); font-size: 14px; font-weight: 700; }
 
-  /* ── Sector Bar ──────────────────────────────────────────── */
-  .sector-row {
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
-  }
+  .sector-row { padding: 14px 18px; border-bottom: 1px solid var(--border); background: var(--surface); }
   .sector-row h4 { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-bottom: 10px; letter-spacing: .05em; }
   .sector-list { display: flex; flex-wrap: wrap; gap: 6px; }
-  .sector-pill {
-    font-family: var(--font-mono); font-size: 10px;
-    background: var(--tag-bg); border: 1px solid var(--border);
-    border-radius: 20px; padding: 3px 10px;
-    display: flex; align-items: center; gap: 6px;
-  }
+  .sector-pill { font-family: var(--font-mono); font-size: 10px; background: var(--tag-bg); border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; display: flex; align-items: center; gap: 6px; }
   .sector-pill .pct { color: var(--accent); font-weight: 700; }
-  .sector-bar-row { margin-top: 8px; }
-  .sector-bar-track {
-    height: 4px; background: var(--border); border-radius: 2px;
-    overflow: hidden; display: flex;
-  }
-  .sector-bar-seg { height: 100%; transition: width .4s; }
+  .sector-bar-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; display: flex; margin-top: 8px; }
+  .sector-bar-seg { height: 100%; }
 
-  /* ── Table ──────────────────────────────────────────────── */
+  .stocks-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .stocks-panel-hd { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
+  .stocks-panel-hd h3 { font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
+  .stocks-panel-hd .hd-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .search-inline { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px; color: var(--text); font-family: var(--font-mono); font-size: 11px; width: 180px; outline: none; transition: border-color .2s; }
+  .search-inline:focus { border-color: var(--accent); }
+  .search-inline::placeholder { color: var(--muted); }
   .tbl-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 12px; }
   thead { background: var(--bg); }
-  thead th {
-    padding: 10px 14px;
-    text-align: left;
-    font-family: var(--font-mono); font-size: 10px;
-    color: var(--muted); letter-spacing: .08em;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap; user-select: none;
-    cursor: pointer;
-  }
+  thead th { padding: 10px 14px; text-align: left; font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: .08em; border-bottom: 1px solid var(--border); white-space: nowrap; user-select: none; cursor: pointer; }
   thead th:hover { color: var(--text); }
   thead th.num { text-align: right; }
   tbody tr { border-bottom: 1px solid rgba(45,55,72,.5); transition: background .1s; }
@@ -253,125 +114,53 @@
   td.code { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--accent); }
   .gain-text { color: var(--gain); }
   .loss-text { color: var(--loss); }
-  .neutral-text { color: var(--muted); }
-  .sector-tag {
-    display: inline-block;
-    background: var(--tag-bg);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 2px 6px;
-    font-size: 9px; font-family: var(--font-mono);
-    color: var(--muted); letter-spacing: .04em;
-  }
-  .pf-bar {
-    display: flex; align-items: center; gap: 8px;
-  }
-  .pf-track {
-    height: 3px; width: 60px; background: var(--border); border-radius: 2px; overflow: hidden;
-  }
+  .sector-tag { display: inline-block; background: var(--tag-bg); border: 1px solid var(--border); border-radius: 3px; padding: 2px 6px; font-size: 9px; font-family: var(--font-mono); color: var(--muted); }
+  .pf-bar { display: flex; align-items: center; gap: 8px; }
+  .pf-track { height: 3px; width: 60px; background: var(--border); border-radius: 2px; overflow: hidden; }
   .pf-fill { height: 100%; background: var(--accent); border-radius: 2px; }
   td .row-actions { display: flex; gap: 4px; opacity: 0; transition: opacity .15s; }
   tr:hover .row-actions { opacity: 1; }
+  .no-stocks { padding: 40px; text-align: center; color: var(--muted); font-family: var(--font-mono); font-size: 12px; }
+  .no-stocks svg { width: 32px; height: 32px; margin: 0 auto 10px; display: block; opacity: .3; }
 
-  /* ── Dividend Table ──────────────────────────────────────── */
-  .dividend-section {
-    margin-top: 24px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .dividend-section .stocks-panel-hd { border-bottom: 1px solid var(--border); }
-  .div-total {
-    padding: 12px 18px;
-    font-family: var(--font-mono); font-size: 12px;
-    border-top: 1px solid var(--border);
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .div-total span { color: var(--gold); font-weight: 700; }
+  .dividend-section { margin-top: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .div-total { padding: 12px 18px; font-family: var(--font-mono); font-size: 12px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .div-total .gold { color: var(--gold); font-weight: 700; }
 
-  /* ── Modal ──────────────────────────────────────────────── */
-  .modal-backdrop {
-    position: fixed; inset: 0; z-index: 200;
-    background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
-    display: flex; align-items: center; justify-content: center;
-    padding: 20px;
-  }
+  .modal-backdrop { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 20px; }
   .modal-backdrop.hidden { display: none; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    width: 100%; max-width: 480px;
-    box-shadow: var(--shadow);
-    animation: modal-in .15s ease;
-  }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; width: 100%; max-width: 480px; box-shadow: var(--shadow); animation: modal-in .15s ease; }
   @keyframes modal-in { from { opacity: 0; transform: scale(.95) translateY(-10px); } to { opacity: 1; transform: none; } }
-  .modal-hd {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 20px; border-bottom: 1px solid var(--border);
-  }
+  .modal-hd { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
   .modal-hd h3 { font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
-  .modal-close {
-    background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px;
-    line-height: 1; padding: 2px 6px; border-radius: 4px; transition: color .15s;
-  }
+  .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1; padding: 2px 6px; border-radius: 4px; transition: color .15s; }
   .modal-close:hover { color: var(--text); }
   .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
   .modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--border); }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
   .form-group label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: .08em; }
-  .form-group input, .form-group select {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 9px 12px;
-    color: var(--text);
-    font-family: var(--font-mono); font-size: 12px;
-    outline: none; transition: border-color .2s;
-    width: 100%;
-  }
+  .form-group input, .form-group select { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 12px; color: var(--text); font-family: var(--font-mono); font-size: 12px; outline: none; transition: border-color .2s; width: 100%; }
   .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+  .form-group input:disabled { background: var(--surface2); color: var(--muted); cursor: not-allowed; }
   .form-group input::placeholder { color: var(--muted); }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .form-hint { font-size: 10px; color: var(--muted); font-family: var(--font-mono); }
-  .form-error { color: var(--loss); font-size: 10px; font-family: var(--font-mono); }
+  .form-error { color: var(--loss); font-size: 10px; font-family: var(--font-mono); min-height: 14px; }
+  .form-hint  { font-size: 10px; color: var(--muted); font-family: var(--font-mono); min-height: 14px; }
+  .confirm-msg  { font-size: 13px; line-height: 1.6; }
+  .confirm-warn { font-family: var(--font-mono); font-size: 11px; color: var(--loss); margin-top: 8px; }
 
-  /* ── Toast ───────────────────────────────────────────────── */
+  /* Stock picker dropdown */
+  .stock-picker-wrap { position: relative; }
+  .stock-picker { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 12px; color: var(--text); font-family: var(--font-mono); font-size: 12px; outline: none; transition: border-color .2s; width: 100%; cursor: pointer; appearance: none; }
+  .stock-picker:focus { border-color: var(--accent); }
+  .stock-picker-wrap::after { content: '▼'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--muted); font-size: 10px; }
+
   .toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
-  .toast {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 10px 16px;
-    font-family: var(--font-mono); font-size: 11px;
-    box-shadow: var(--shadow);
-    animation: toast-in .2s ease;
-    display: flex; align-items: center; gap: 8px;
-  }
+  .toast { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 16px; font-family: var(--font-mono); font-size: 11px; box-shadow: var(--shadow); animation: toast-in .2s ease; display: flex; align-items: center; gap: 8px; }
   .toast.success { border-left: 3px solid var(--gain); }
   .toast.error   { border-left: 3px solid var(--loss); }
   .toast.info    { border-left: 3px solid var(--accent); }
   @keyframes toast-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-
-  /* ── Misc ────────────────────────────────────────────────── */
-  .gain-bg { background: rgba(57,211,83,.08); }
-  .loss-bg { background: rgba(248,81,73,.08); }
-  .badge {
-    display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 10px;
-    font-family: var(--font-mono); font-weight: 700;
-  }
-  .badge-gain { background: rgba(57,211,83,.15); color: var(--gain); }
-  .badge-loss { background: rgba(248,81,73,.15); color: var(--loss); }
-  .no-stocks {
-    padding: 40px; text-align: center;
-    color: var(--muted); font-family: var(--font-mono); font-size: 12px;
-  }
-  .no-stocks svg { width: 32px; height: 32px; margin-bottom: 10px; opacity: .3; }
-
-  /* Confirm dialog */
-  .confirm-msg { font-size: 13px; color: var(--text); line-height: 1.6; }
-  .confirm-warn { font-family: var(--font-mono); font-size: 11px; color: var(--loss); margin-top: 8px; }
 
   @media (max-width: 600px) {
     .header-inner { flex-direction: column; align-items: flex-start; }
@@ -384,7 +173,6 @@
 </head>
 <body>
 
-<!-- ── Header ─────────────────────────────────────────────────── -->
 <header class="site-header">
   <div class="header-inner">
     <div class="logo-block">
@@ -402,116 +190,105 @@
   </div>
 </header>
 
-<!-- ── Main Page ───────────────────────────────────────────────── -->
 <div class="page">
-
-  <!-- Portfolios Section -->
-  <div class="section-hd">
-    <h2>MY PORTFOLIOS &nbsp;<span id="portfolio-count">0</span></h2>
-    <button class="btn btn-primary" onclick="openPortfolioModal()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      New Portfolio
-    </button>
+  <div id="page-loading" class="page-loading">
+    <div class="spinner"></div> Loading portfolios…
   </div>
 
-  <div class="portfolio-grid" id="portfolio-grid"></div>
-
-  <hr class="divider" id="stocks-divider" style="display:none">
-
-  <!-- Stocks Panel -->
-  <div id="stocks-section" style="display:none">
-    <div class="section-hd" style="margin-bottom:12px">
-      <h2>HOLDINGS &nbsp;·&nbsp; <span id="active-portfolio-name" style="color:var(--accent)"></span></h2>
+  <div id="page-content" style="display:none">
+    <div class="section-hd">
+      <h2>MY PORTFOLIOS &nbsp;<span id="portfolio-count">0</span></h2>
+      <button class="btn btn-primary" onclick="openPortfolioModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Portfolio
+      </button>
     </div>
+    <div class="portfolio-grid" id="portfolio-grid"></div>
 
-    <!-- Summary Bar -->
-    <div class="summary-bar" id="summary-bar">
-      <div class="sb-item"><div class="sb-lbl">TOTAL COST</div><div class="sb-val" id="sb-cost">৳ 0</div></div>
-      <div class="sb-item"><div class="sb-lbl">MARKET VALUE</div><div class="sb-val" id="sb-mktval">৳ 0</div></div>
-      <div class="sb-item"><div class="sb-lbl">UNREALIZED P&L</div><div class="sb-val" id="sb-pl">৳ 0</div></div>
-      <div class="sb-item"><div class="sb-lbl">GAIN %</div><div class="sb-val" id="sb-pct">0%</div></div>
-      <div class="sb-item"><div class="sb-lbl">HOLDINGS</div><div class="sb-val" id="sb-count">0</div></div>
-    </div>
+    <hr class="divider" id="stocks-divider" style="display:none">
 
-    <!-- Sector Exposure -->
-    <div class="sector-row" id="sector-row"></div>
+    <div id="stocks-section" style="display:none">
+      <div class="section-hd" style="margin-bottom:12px">
+        <h2>HOLDINGS &nbsp;·&nbsp; <span id="active-portfolio-name" style="color:var(--accent)"></span></h2>
+      </div>
 
-    <!-- Holdings Table -->
-    <div class="stocks-panel">
-      <div class="stocks-panel-hd">
-        <h3>HOLDINGS TABLE</h3>
-        <div class="hd-right">
-          <input class="search-inline" id="stock-search" placeholder="Search stock…" oninput="renderStocksTable()" />
-          <button class="btn btn-gain btn-sm" onclick="openAddStockModal()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add Stock
-          </button>
+      <div class="summary-bar" style="background:var(--surface);border:1px solid var(--border);border-radius:8px 8px 0 0;margin-bottom:0">
+        <div class="sb-item"><div class="sb-lbl">TOTAL COST</div><div class="sb-val" id="sb-cost">৳ 0</div></div>
+        <div class="sb-item"><div class="sb-lbl">MARKET VALUE</div><div class="sb-val" id="sb-mktval">৳ 0</div></div>
+        <div class="sb-item"><div class="sb-lbl">UNREALIZED P&L</div><div class="sb-val" id="sb-pl">৳ 0</div></div>
+        <div class="sb-item"><div class="sb-lbl">GAIN %</div><div class="sb-val" id="sb-pct">0%</div></div>
+        <div class="sb-item"><div class="sb-lbl">HOLDINGS</div><div class="sb-val" id="sb-count">0</div></div>
+      </div>
+
+      <div class="sector-row" id="sector-row" style="border:1px solid var(--border);border-top:none;margin-bottom:16px"></div>
+
+      <div class="stocks-panel">
+        <div class="stocks-panel-hd">
+          <h3>HOLDINGS TABLE</h3>
+          <div class="hd-right">
+            <input class="search-inline" id="stock-search" placeholder="Search stock…" oninput="renderStocksTable()" />
+            <button class="btn btn-gain btn-sm" onclick="openAddStockModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Stock
+            </button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th onclick="sortStocks('code')">CODE ↕</th>
+                <th onclick="sortStocks('company')">COMPANY ↕</th>
+                <th class="num" onclick="sortStocks('qty')">QTY ↕</th>
+                <th class="num" onclick="sortStocks('cost')">COST/SH ↕</th>
+                <th class="num" onclick="sortStocks('costAmt')">COST AMT ↕</th>
+                <th class="num" onclick="sortStocks('mktPrice')">MKT PRICE ↕</th>
+                <th class="num" onclick="sortStocks('mktValue')">MKT VALUE ↕</th>
+                <th class="num" onclick="sortStocks('unrealized')">UNREALIZED ↕</th>
+                <th class="num" onclick="sortStocks('gain')">GAIN% ↕</th>
+                <th class="num" onclick="sortStocks('portfolio')">%PORTFOLIO ↕</th>
+                <th>SECTOR</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="stocks-tbody"></tbody>
+          </table>
+          <div id="no-stocks-msg" class="no-stocks" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            No holdings yet. Add your first stock!
+          </div>
         </div>
       </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th onclick="sortStocks('code')">CODE ↕</th>
-              <th onclick="sortStocks('company')">COMPANY ↕</th>
-              <th class="num" onclick="sortStocks('qty')">QTY ↕</th>
-              <th class="num" onclick="sortStocks('cost')">COST/SH ↕</th>
-              <th class="num" onclick="sortStocks('costAmt')">COST AMT ↕</th>
-              <th class="num" onclick="sortStocks('mktPrice')">MKT PRICE ↕</th>
-              <th class="num" onclick="sortStocks('mktValue')">MKT VALUE ↕</th>
-              <th class="num" onclick="sortStocks('unrealized')">UNREALIZED ↕</th>
-              <th class="num" onclick="sortStocks('gain')">GAIN% ↕</th>
-              <th class="num" onclick="sortStocks('portfolio')">%PORTFOLIO ↕</th>
-              <th>SECTOR</th>
-              <th>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody id="stocks-tbody"></tbody>
-        </table>
-        <div id="no-stocks-msg" class="no-stocks" style="display:none">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          <div>No holdings yet. Add your first stock!</div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Dividend Table -->
-    <div class="dividend-section" id="dividend-section" style="display:none">
-      <div class="stocks-panel-hd">
-        <h3>CASH DIVIDEND RECEIVABLE</h3>
-      </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>COMPANY</th>
-              <th>A/C TYPE</th>
-              <th class="num">HOLDINGS</th>
-              <th class="num">RATE (TK)</th>
-              <th class="num">ENTITLEMENT (TK)</th>
-              <th>RECORD DATE</th>
-              <th>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody id="dividend-tbody"></tbody>
-        </table>
-      </div>
-      <div class="div-total">
-        <span style="color:var(--muted); font-size:11px">TOTAL RECEIVABLE</span>
-        <span id="div-total-val">৳ 0.00</span>
+      <div class="dividend-section">
+        <div class="stocks-panel-hd">
+          <h3>CASH DIVIDEND RECEIVABLE</h3>
+          <div class="hd-right">
+            <button class="btn btn-ghost btn-sm" onclick="openAddDividendModal()">+ Add Dividend</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>COMPANY</th><th>A/C TYPE</th>
+                <th class="num">HOLDINGS</th><th class="num">RATE (TK)</th>
+                <th class="num">ENTITLEMENT (TK)</th><th>RECORD DATE</th><th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="dividend-tbody"></tbody>
+          </table>
+        </div>
+        <div class="div-total">
+          <span style="color:var(--muted);font-size:11px">TOTAL RECEIVABLE</span>
+          <span class="gold" id="div-total-val">৳ 0.00</span>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
-</div><!-- /page -->
-
-<!-- Toast Container -->
 <div class="toast-wrap" id="toast-wrap"></div>
-
-<!-- ══════════════════════════════════════════════════════════
-     MODALS
-═════════════════════════════════════════════════════════════ -->
 
 <!-- Portfolio Modal -->
 <div class="modal-backdrop hidden" id="portfolio-modal">
@@ -522,30 +299,17 @@
     </div>
     <div class="modal-body">
       <input type="hidden" id="pf-edit-id" />
-      <div class="form-group">
-        <label>PORTFOLIO NAME *</label>
-        <input id="pf-name" type="text" placeholder="e.g. Main Portfolio" maxlength="60" />
+      <div class="form-group"><label>PORTFOLIO NAME *</label><input id="pf-name" type="text" placeholder="e.g. Main Portfolio" maxlength="60" /></div>
+      <div class="form-group"><label>CLIENT CODE / BO ID</label><input id="pf-code" type="text" placeholder="e.g. Y7762" maxlength="40" /></div>
+      <div class="form-group"><label>ACCOUNT TYPE</label>
+        <select id="pf-type"><option value="CASH">CASH</option><option value="MARGIN">MARGIN</option></select>
       </div>
-      <div class="form-group">
-        <label>CLIENT CODE / BO ID</label>
-        <input id="pf-code" type="text" placeholder="e.g. Y7762" maxlength="40" />
-      </div>
-      <div class="form-group">
-        <label>ACCOUNT TYPE</label>
-        <select id="pf-type">
-          <option value="CASH">CASH</option>
-          <option value="MARGIN">MARGIN</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>BROKER / DEPOSITORY</label>
-        <input id="pf-broker" type="text" placeholder="e.g. LankaBangla Securities PLC" maxlength="80" />
-      </div>
+      <div class="form-group"><label>BROKER / DEPOSITORY</label><input id="pf-broker" type="text" placeholder="e.g. LankaBangla Securities PLC" maxlength="80" /></div>
       <div id="pf-error" class="form-error"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('portfolio-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="savePortfolio()">Save Portfolio</button>
+      <button class="btn btn-primary" id="pf-save-btn" onclick="savePortfolio()">Save Portfolio</button>
     </div>
   </div>
 </div>
@@ -559,70 +323,38 @@
     </div>
     <div class="modal-body">
       <input type="hidden" id="st-edit-id" />
-      <div class="form-row">
-        <div class="form-group">
-          <label>STOCK CODE *</label>
-          <input id="st-code" type="text" placeholder="e.g. GPHL" maxlength="30" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()" />
-        </div>
-        <div class="form-group">
-          <label>COMPANY NAME *</label>
-          <input id="st-company" type="text" placeholder="e.g. GPH Ispat Limited" maxlength="100" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>TOTAL QTY *</label>
-          <input id="st-qty" type="number" placeholder="e.g. 36857" min="0" />
-        </div>
-        <div class="form-group">
-          <label>SALEABLE QTY</label>
-          <input id="st-sale-qty" type="number" placeholder="e.g. 36857" min="0" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>COST / SHARE (TK) *</label>
-          <input id="st-cost" type="number" step="0.01" placeholder="e.g. 16.52" min="0" />
-        </div>
-        <div class="form-group">
-          <label>MARKET PRICE (TK) *</label>
-          <input id="st-mkt" type="number" step="0.01" placeholder="e.g. 15.90" min="0" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>SECTOR</label>
-          <select id="st-sector">
-            <option value="">— Select —</option>
-            <option>BANK</option>
-            <option>CEMENT</option>
-            <option>ENGINEERING</option>
-            <option>FOOD ALLIED</option>
-            <option>FUEL POWER</option>
-            <option>INSURANCE</option>
-            <option>MISCELLANEOUS</option>
-            <option>MUTUAL FUNDS</option>
-            <option>NBFI</option>
-            <option>PHARMACEUTICALS CHEMICAL</option>
-            <option>SERVICES REAL ESTATE</option>
-            <option>TELECOMMUNICATION</option>
-            <option>TRAVEL LEISURE</option>
-            <option>TEXTILE</option>
-            <option>IT</option>
-            <option>OTHER</option>
+      <div class="form-group">
+        <label>STOCK CODE *</label>
+        <div class="stock-picker-wrap">
+          <select id="st-code" onchange="onStockCodeChanged()">
+            <option value="">— Select Stock —</option>
           </select>
         </div>
+      </div>
+      <div class="form-group">
+        <label>COMPANY NAME</label>
+        <input id="st-company" type="text" disabled />
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>TOTAL QTY *</label><input id="st-qty" type="number" placeholder="e.g. 36857" min="0" oninput="updateStockPreview()" /></div>
+        <div class="form-group"><label>COST / SHARE (TK) *</label><input id="st-cost" type="number" step="0.01" placeholder="e.g. 16.52" min="0" oninput="updateStockPreview()" /></div>
+      </div>
+      <div class="form-row">
         <div class="form-group">
-          <label>LOCK QTY</label>
-          <input id="st-lock" type="number" placeholder="0" min="0" />
+          <label>MARKET PRICE (TK)</label>
+          <input id="st-mkt" type="number" step="0.01" disabled />
+        </div>
+        <div class="form-group">
+          <label>SECTOR</label>
+          <input id="st-sector" type="text" disabled />
         </div>
       </div>
       <div id="st-error" class="form-error"></div>
-      <div class="form-hint" id="st-preview"></div>
+      <div id="st-preview" class="form-hint"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('stock-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveStock()">Save Stock</button>
+      <button class="btn btn-primary" id="st-save-btn" onclick="saveStock()">Save Stock</button>
     </div>
   </div>
 </div>
@@ -636,38 +368,22 @@
     </div>
     <div class="modal-body">
       <input type="hidden" id="dv-edit-id" />
-      <div class="form-group">
-        <label>COMPANY NAME *</label>
-        <input id="dv-company" type="text" placeholder="e.g. Eastern Bank PLC" />
+      <div class="form-group"><label>COMPANY NAME *</label><input id="dv-company" type="text" placeholder="e.g. Eastern Bank PLC" /></div>
+      <div class="form-row">
+        <div class="form-group"><label>A/C TYPE</label>
+          <select id="dv-type"><option value="CASH">CASH</option><option value="MARGIN">MARGIN</option></select>
+        </div>
+        <div class="form-group"><label>BO HOLDINGS *</label><input id="dv-holdings" type="number" placeholder="e.g. 6" min="0" /></div>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label>A/C TYPE</label>
-          <select id="dv-type">
-            <option value="CASH">CASH</option>
-            <option value="MARGIN">MARGIN</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>BO HOLDINGS *</label>
-          <input id="dv-holdings" type="number" placeholder="e.g. 6" min="0" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>RATE (TK/SHARE) *</label>
-          <input id="dv-rate" type="number" step="0.01" placeholder="e.g. 2.50" min="0" />
-        </div>
-        <div class="form-group">
-          <label>RECORD DATE</label>
-          <input id="dv-date" type="date" />
-        </div>
+        <div class="form-group"><label>RATE (TK/SHARE) *</label><input id="dv-rate" type="number" step="0.01" placeholder="e.g. 2.50" min="0" /></div>
+        <div class="form-group"><label>RECORD DATE</label><input id="dv-date" type="date" /></div>
       </div>
       <div id="dv-error" class="form-error"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('dividend-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveDividend()">Save</button>
+      <button class="btn btn-primary" id="dv-save-btn" onclick="saveDividend()">Save</button>
     </div>
   </div>
 </div>
@@ -690,64 +406,74 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     SCRIPT
-═════════════════════════════════════════════════════════════ -->
 <script>
-/* ─── Storage ─────────────────────────────────────────────── */
-const STORE_KEY = 'dse_portfolios_v2';
-let state = {
-  portfolios: [],   // { id, name, code, type, broker, stocks:[], dividends:[] }
-  activeId: null,
-  stockSort: { col: 'code', dir: 1 }
-};
+const API = 'http://localhost:3000';
 
-function load() {
+let portfolios = [];
+let activeId   = null;
+let stockSort  = { col: 'code', dir: 1 };
+let allStocks  = []; // Live stock data from API
+
+// ── Boot ───────────────────────────────────────────────────────────────────────
+async function init() {
   try {
-    const raw = localStorage.getItem(STORE_KEY);
-    if (raw) Object.assign(state, JSON.parse(raw));
-  } catch(e) {}
-}
-function save() {
-  localStorage.setItem(STORE_KEY, JSON.stringify(state));
-}
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-
-/* ─── Init ────────────────────────────────────────────────── */
-load();
-render();
-
-/* ─── Render All ──────────────────────────────────────────── */
-function render() {
+    const data = await apiFetch('/api/portfolios');
+    portfolios = data.portfolios || [];
+  } catch(e) {
+    toast('Could not connect to server. Is it running?', 'error');
+    portfolios = [];
+  }
+  
+  // Fetch live stock data
+  await loadStockData();
+  
+  document.getElementById('page-loading').style.display = 'none';
+  document.getElementById('page-content').style.display = '';
   renderPortfolioGrid();
-  if (state.activeId) renderStocksPanel();
-  else hideStocksPanel();
 }
 
-/* ─── Portfolio Grid ──────────────────────────────────────── */
+async function loadStockData() {
+  try {
+    const res = await fetch(API + '/api/stocks');
+    const data = await res.json();
+    allStocks = data.stocks || [];
+  } catch(e) {
+    console.error('Could not load stock data', e);
+    allStocks = [];
+  }
+}
+
+// ── API helper ─────────────────────────────────────────────────────────────────
+async function apiFetch(path, opts = {}) {
+  const r = await fetch(API + path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+  if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.error || `HTTP ${r.status}`); }
+  return r.json();
+}
+
+// ── Portfolio grid ─────────────────────────────────────────────────────────────
 function renderPortfolioGrid() {
   const grid = document.getElementById('portfolio-grid');
-  document.getElementById('portfolio-count').textContent = state.portfolios.length;
+  document.getElementById('portfolio-count').textContent = portfolios.length;
   let html = '';
 
-  state.portfolios.forEach(pf => {
-    const isActive = pf.id === state.activeId;
-    const totCost = pf.stocks.reduce((s, st) => s + (st.cost * st.qty), 0);
-    const totMkt  = pf.stocks.reduce((s, st) => s + (st.mktPrice * st.qty), 0);
+  portfolios.forEach(pf => {
+    const isActive = pf.id === activeId;
+    const totCost = (pf.stocks||[]).reduce((s,st) => s + st.cost*st.qty, 0);
+    const totMkt  = (pf.stocks||[]).reduce((s,st) => s + st.mktPrice*st.qty, 0);
     const pl      = totMkt - totCost;
-    const plPct   = totCost ? (pl / totCost * 100) : 0;
-    const plClass = pl >= 0 ? 'gain-text' : 'loss-text';
-    const plSign  = pl >= 0 ? '+' : '';
+    const plPct   = totCost ? pl/totCost*100 : 0;
+    const gc      = pl >= 0 ? 'gain-text' : 'loss-text';
+    const sign    = pl >= 0 ? '+' : '';
 
-    html += `<div class="portfolio-card ${isActive ? 'active' : ''}" onclick="selectPortfolio('${pf.id}')">
+    html += `<div class="portfolio-card${isActive?' active':''}" onclick="selectPortfolio('${pf.id}')">
       <div class="pc-name">${esc(pf.name)}</div>
-      <div class="pc-meta">${esc(pf.code || '—')} · ${esc(pf.type)} · ${esc(pf.broker || '—')}</div>
+      <div class="pc-meta">${esc(pf.code||'—')} · ${esc(pf.type)} · ${esc(pf.broker||'—')}</div>
       <div class="pc-stats">
-        <div class="pc-stat"><span class="lbl">HOLDINGS</span><span class="val">${pf.stocks.length}</span></div>
+        <div class="pc-stat"><span class="lbl">HOLDINGS</span><span class="val">${(pf.stocks||[]).length}</span></div>
         <div class="pc-stat"><span class="lbl">COST AMT</span><span class="val">৳ ${fmt(totCost)}</span></div>
         <div class="pc-stat"><span class="lbl">MKT VALUE</span><span class="val">৳ ${fmt(totMkt)}</span></div>
-        <div class="pc-stat"><span class="lbl">UNREALIZED</span><span class="val ${plClass}">${plSign}৳ ${fmt(pl)}</span></div>
-        <div class="pc-stat"><span class="lbl">GAIN %</span><span class="val ${plClass}">${plSign}${plPct.toFixed(2)}%</span></div>
+        <div class="pc-stat"><span class="lbl">UNREALIZED</span><span class="val ${gc}">${sign}৳ ${fmt(pl)}</span></div>
+        <div class="pc-stat"><span class="lbl">GAIN %</span><span class="val ${gc}">${sign}${plPct.toFixed(2)}%</span></div>
       </div>
       <div class="pc-actions" onclick="event.stopPropagation()">
         <button class="btn btn-ghost btn-sm" onclick="openPortfolioModal('${pf.id}')">Edit</button>
@@ -760,124 +486,82 @@ function renderPortfolioGrid() {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     <span>New Portfolio</span>
   </div>`;
-
   grid.innerHTML = html;
 }
 
 function selectPortfolio(id) {
-  state.activeId = id;
-  save();
+  activeId = id;
   renderPortfolioGrid();
   renderStocksPanel();
   document.getElementById('stocks-divider').style.display = '';
   document.getElementById('stocks-section').style.display = '';
+  document.getElementById('stocks-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function hideStocksPanel() {
-  document.getElementById('stocks-divider').style.display = 'none';
-  document.getElementById('stocks-section').style.display = 'none';
-}
-
-/* ─── Stocks Panel ────────────────────────────────────────── */
+// ── Stocks panel ───────────────────────────────────────────────────────────────
 function renderStocksPanel() {
-  const pf = getActive();
-  if (!pf) return hideStocksPanel();
+  const pf = getActive(); if (!pf) return;
   document.getElementById('active-portfolio-name').textContent = pf.name;
-
-  const stocks = pf.stocks;
-  const totMkt  = stocks.reduce((s, st) => s + (st.mktPrice * st.qty), 0);
-  const totCost = stocks.reduce((s, st) => s + (st.cost * st.qty), 0);
+  const stocks  = pf.stocks || [];
+  const totCost = stocks.reduce((s,st) => s + st.cost*st.qty, 0);
+  const totMkt  = stocks.reduce((s,st) => s + st.mktPrice*st.qty, 0);
   const pl      = totMkt - totCost;
-  const plPct   = totCost ? (pl / totCost * 100) : 0;
-  const plClass = pl >= 0 ? 'gain-text' : 'loss-text';
-  const plSign  = pl >= 0 ? '+' : '';
+  const plPct   = totCost ? pl/totCost*100 : 0;
+  const gc      = pl >= 0 ? 'gain-text' : 'loss-text';
+  const sign    = pl >= 0 ? '+' : '';
 
-  // Summary
   document.getElementById('sb-cost').textContent   = '৳ ' + fmt(totCost);
   document.getElementById('sb-mktval').textContent  = '৳ ' + fmt(totMkt);
   const plEl = document.getElementById('sb-pl');
-  plEl.textContent  = `${plSign}৳ ${fmt(pl)}`;
-  plEl.className    = 'sb-val ' + plClass;
+  plEl.textContent = `${sign}৳ ${fmt(pl)}`; plEl.className = 'sb-val ' + gc;
   const pctEl = document.getElementById('sb-pct');
-  pctEl.textContent = `${plSign}${plPct.toFixed(2)}%`;
-  pctEl.className   = 'sb-val ' + plClass;
-  document.getElementById('sb-count').textContent  = stocks.length;
+  pctEl.textContent = `${sign}${plPct.toFixed(2)}%`; pctEl.className = 'sb-val ' + gc;
+  document.getElementById('sb-count').textContent = stocks.length;
 
   renderSectorExposure(stocks, totMkt);
   renderStocksTable();
   renderDividends();
 }
 
-/* ─── Sector Exposure ─────────────────────────────────────── */
-const SECTOR_COLORS = [
-  '#58a6ff','#39d353','#d29922','#f85149','#bc8cff','#79c0ff',
-  '#56d364','#e3b341','#ff7b72','#a5d6ff','#7ee787','#ffa657'
-];
+// ── Sector exposure ────────────────────────────────────────────────────────────
+const COLORS = ['#58a6ff','#39d353','#d29922','#f85149','#bc8cff','#79c0ff','#56d364','#e3b341','#ff7b72','#a5d6ff','#7ee787','#ffa657'];
+
 function renderSectorExposure(stocks, totMkt) {
   const map = {};
-  stocks.forEach(st => {
-    const sec = st.sector || 'OTHER';
-    const mv  = st.mktPrice * st.qty;
-    map[sec]  = (map[sec] || 0) + mv;
-  });
+  stocks.forEach(st => { const s = st.sector||'OTHER'; map[s] = (map[s]||0) + st.mktPrice*st.qty; });
   const entries = Object.entries(map).sort((a,b) => b[1]-a[1]);
-
-  let pillsHtml = entries.map(([sec, mv], i) => {
-    const pct = totMkt ? (mv / totMkt * 100).toFixed(2) : '0.00';
-    return `<div class="sector-pill"><span>${sec}</span><span class="pct">${pct}%</span></div>`;
-  }).join('');
-
-  let barSegs = entries.map(([, mv], i) => {
-    const pct = totMkt ? (mv / totMkt * 100) : 0;
-    return `<div class="sector-bar-seg" style="width:${pct.toFixed(2)}%;background:${SECTOR_COLORS[i % SECTOR_COLORS.length]}"></div>`;
-  }).join('');
-
-  document.getElementById('sector-row').innerHTML = `
-    <h4>SECTOR EXPOSURE</h4>
-    <div class="sector-list">${pillsHtml || '<span style="color:var(--muted);font-size:11px">No data</span>'}</div>
-    <div class="sector-bar-row"><div class="sector-bar-track">${barSegs}</div></div>
-  `;
+  const pills = entries.map(([s,mv],i) => `<div class="sector-pill"><span>${s}</span><span class="pct">${totMkt?(mv/totMkt*100).toFixed(2):'0.00'}%</span></div>`).join('');
+  const segs  = entries.map(([,mv],i) => `<div class="sector-bar-seg" style="width:${totMkt?(mv/totMkt*100).toFixed(2):0}%;background:${COLORS[i%COLORS.length]}"></div>`).join('');
+  document.getElementById('sector-row').innerHTML =
+    `<h4>SECTOR EXPOSURE</h4><div class="sector-list">${pills||'<span style="color:var(--muted);font-size:11px">No data</span>'}</div><div class="sector-bar-track">${segs}</div>`;
 }
 
-/* ─── Stocks Table ────────────────────────────────────────── */
+// ── Stocks table ───────────────────────────────────────────────────────────────
 function renderStocksTable() {
   const pf = getActive(); if (!pf) return;
-  const q  = (document.getElementById('stock-search').value || '').toLowerCase();
-  const { col, dir } = state.stockSort;
+  const q = (document.getElementById('stock-search').value||'').toLowerCase();
+  const { col, dir } = stockSort;
+  const totMkt = (pf.stocks||[]).reduce((s,st) => s + st.mktPrice*st.qty, 0);
 
-  const totMkt = pf.stocks.reduce((s, st) => s + st.mktPrice * st.qty, 0);
-
-  let stocks = pf.stocks
+  const rows = (pf.stocks||[])
     .filter(st => !q || st.code.toLowerCase().includes(q) || st.company.toLowerCase().includes(q))
-    .map(st => ({
-      ...st,
-      costAmt:    st.cost * st.qty,
-      mktValue:   st.mktPrice * st.qty,
-      unrealized: (st.mktPrice - st.cost) * st.qty,
-      gain:       st.cost ? ((st.mktPrice - st.cost) / st.cost * 100) : 0,
-      portfolio:  totMkt ? (st.mktPrice * st.qty / totMkt * 100) : 0
+    .map(st => ({ ...st,
+      costAmt:    st.cost*st.qty,
+      mktValue:   st.mktPrice*st.qty,
+      unrealized: (st.mktPrice-st.cost)*st.qty,
+      gain:       st.cost ? (st.mktPrice-st.cost)/st.cost*100 : 0,
+      portfolio:  totMkt ? st.mktPrice*st.qty/totMkt*100 : 0
     }))
-    .sort((a, b) => {
-      let av = a[col], bv = b[col];
-      if (typeof av === 'string') return dir * av.localeCompare(bv);
-      return dir * (av - bv);
-    });
+    .sort((a,b) => typeof a[col]==='string' ? dir*a[col].localeCompare(b[col]) : dir*(a[col]-b[col]));
 
   const tbody = document.getElementById('stocks-tbody');
   const noMsg = document.getElementById('no-stocks-msg');
-
-  if (!stocks.length) {
-    tbody.innerHTML = '';
-    noMsg.style.display = '';
-    return;
-  }
+  if (!rows.length) { tbody.innerHTML=''; noMsg.style.display=''; return; }
   noMsg.style.display = 'none';
 
-  tbody.innerHTML = stocks.map(st => {
-    const gc   = st.unrealized >= 0 ? 'gain-text' : 'loss-text';
-    const sign = st.unrealized >= 0 ? '+' : '';
-    const pfPct = Math.min(st.portfolio, 100);
-
+  tbody.innerHTML = rows.map(st => {
+    const gc = st.unrealized >= 0 ? 'gain-text' : 'loss-text';
+    const s  = st.unrealized >= 0 ? '+' : '';
     return `<tr>
       <td class="code">${esc(st.code)}</td>
       <td>${esc(st.company)}</td>
@@ -886,360 +570,342 @@ function renderStocksTable() {
       <td class="num">৳ ${fmt(st.costAmt)}</td>
       <td class="num">৳ ${fmt(st.mktPrice)}</td>
       <td class="num">৳ ${fmt(st.mktValue)}</td>
-      <td class="num ${gc}">${sign}৳ ${fmt(st.unrealized)}</td>
-      <td class="num ${gc}">${sign}${st.gain.toFixed(2)}%</td>
-      <td class="num">
-        <div class="pf-bar">
-          <span>${st.portfolio.toFixed(2)}%</span>
-          <div class="pf-track"><div class="pf-fill" style="width:${pfPct}%"></div></div>
-        </div>
-      </td>
-      <td>${st.sector ? `<span class="sector-tag">${esc(st.sector)}</span>` : '—'}</td>
-      <td>
-        <div class="row-actions">
-          <button class="btn btn-ghost btn-sm" onclick="openEditStockModal('${st.id}')">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="confirmDeleteStock('${st.id}')">Del</button>
-        </div>
-      </td>
+      <td class="num ${gc}">${s}৳ ${fmt(st.unrealized)}</td>
+      <td class="num ${gc}">${s}${st.gain.toFixed(2)}%</td>
+      <td class="num"><div class="pf-bar"><span>${st.portfolio.toFixed(2)}%</span><div class="pf-track"><div class="pf-fill" style="width:${Math.min(st.portfolio,100)}%"></div></div></div></td>
+      <td>${st.sector?`<span class="sector-tag">${esc(st.sector)}</span>`:'—'}</td>
+      <td><div class="row-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openEditStockModal('${st.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteStock('${st.id}')">Del</button>
+      </div></td>
     </tr>`;
   }).join('');
 }
 
 function sortStocks(col) {
-  if (state.stockSort.col === col) state.stockSort.dir *= -1;
-  else { state.stockSort.col = col; state.stockSort.dir = 1; }
+  stockSort = stockSort.col===col ? { col, dir: stockSort.dir*-1 } : { col, dir: 1 };
   renderStocksTable();
 }
 
-/* ─── Dividends ───────────────────────────────────────────── */
+// ── Dividends ──────────────────────────────────────────────────────────────────
 function renderDividends() {
-  const pf = getActive(); if (!pf) return;
+  const pf  = getActive(); if (!pf) return;
   const dvs = pf.dividends || [];
-  const section = document.getElementById('dividend-section');
-
-  // show always
-  section.style.display = '';
-
-  const total = dvs.reduce((s, d) => s + (d.holdings * d.rate), 0);
+  const total = dvs.reduce((s,d) => s + d.holdings*d.rate, 0);
   document.getElementById('div-total-val').textContent = '৳ ' + fmt(total);
-
-  document.getElementById('dividend-tbody').innerHTML = dvs.map((d, i) => {
-    const entitlement = d.holdings * d.rate;
-    return `<tr>
-      <td>${i+1}</td>
-      <td>${esc(d.company)}<span style="color:var(--muted);font-size:10px;font-family:var(--font-mono)"> **</span></td>
-      <td>${esc(d.type)}</td>
-      <td class="num">${fmt(d.holdings, 0)}</td>
-      <td class="num">৳ ${fmt(d.rate)}</td>
-      <td class="num" style="color:var(--gold);font-family:var(--font-mono);font-weight:700">৳ ${fmt(entitlement)}</td>
-      <td>${d.date || '—'}</td>
-      <td>
-        <div class="row-actions">
+  document.getElementById('dividend-tbody').innerHTML = dvs.length
+    ? dvs.map((d,i) => `<tr>
+        <td>${i+1}</td>
+        <td>${esc(d.company)} <span style="color:var(--muted);font-size:10px">**</span></td>
+        <td>${esc(d.type)}</td>
+        <td class="num">${fmt(d.holdings,0)}</td>
+        <td class="num">৳ ${fmt(d.rate)}</td>
+        <td class="num" style="color:var(--gold);font-family:var(--font-mono);font-weight:700">৳ ${fmt(d.holdings*d.rate)}</td>
+        <td>${d.date||'—'}</td>
+        <td><div class="row-actions">
           <button class="btn btn-ghost btn-sm" onclick="openEditDividendModal('${d.id}')">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="confirmDeleteDividend('${d.id}')">Del</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);font-family:var(--font-mono);font-size:11px">
-    No dividends recorded. &nbsp;
-    <button class="btn btn-ghost btn-sm" onclick="openAddDividendModal()">+ Add Dividend</button>
-  </td></tr>`;
-
-  // Add dividend button in header
-  const hdRight = document.querySelector('#dividend-section .hd-right');
-  if (!hdRight) {
-    const hd = document.querySelector('#dividend-section .stocks-panel-hd');
-    const div = document.createElement('div');
-    div.className = 'hd-right';
-    div.innerHTML = `<button class="btn btn-ghost btn-sm" onclick="openAddDividendModal()">+ Add Dividend</button>`;
-    hd.appendChild(div);
-  }
+        </div></td>
+      </tr>`).join('')
+    : `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);font-family:var(--font-mono);font-size:11px">No dividends recorded yet.</td></tr>`;
 }
 
-/* ─── Portfolio CRUD ──────────────────────────────────────── */
+// ── Portfolio CRUD ─────────────────────────────────────────────────────────────
 function openPortfolioModal(id) {
-  const modal = document.getElementById('portfolio-modal');
   document.getElementById('pf-error').textContent = '';
-
   if (id) {
-    const pf = state.portfolios.find(p => p.id === id);
+    const pf = portfolios.find(p => p.id===id);
     document.getElementById('portfolio-modal-title').textContent = 'EDIT PORTFOLIO';
-    document.getElementById('pf-edit-id').value  = pf.id;
+    document.getElementById('pf-edit-id').value = pf.id;
     document.getElementById('pf-name').value    = pf.name;
-    document.getElementById('pf-code').value    = pf.code || '';
+    document.getElementById('pf-code').value    = pf.code||'';
     document.getElementById('pf-type').value    = pf.type;
-    document.getElementById('pf-broker').value  = pf.broker || '';
+    document.getElementById('pf-broker').value  = pf.broker||'';
   } else {
     document.getElementById('portfolio-modal-title').textContent = 'CREATE PORTFOLIO';
     document.getElementById('pf-edit-id').value = '';
-    document.getElementById('pf-name').value = '';
-    document.getElementById('pf-code').value = '';
+    ['pf-name','pf-code','pf-broker'].forEach(x => document.getElementById(x).value = '');
     document.getElementById('pf-type').value = 'CASH';
-    document.getElementById('pf-broker').value = '';
   }
-  modal.classList.remove('hidden');
-  document.getElementById('pf-name').focus();
+  document.getElementById('portfolio-modal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('pf-name').focus(), 50);
 }
 
-function savePortfolio() {
+async function savePortfolio() {
   const name   = document.getElementById('pf-name').value.trim();
   const code   = document.getElementById('pf-code').value.trim();
   const type   = document.getElementById('pf-type').value;
   const broker = document.getElementById('pf-broker').value.trim();
   const editId = document.getElementById('pf-edit-id').value;
-
   if (!name) { document.getElementById('pf-error').textContent = 'Portfolio name is required.'; return; }
-
-  if (editId) {
-    const pf = state.portfolios.find(p => p.id === editId);
-    pf.name = name; pf.code = code; pf.type = type; pf.broker = broker;
-    toast('Portfolio updated.', 'success');
-  } else {
-    state.portfolios.push({ id: uid(), name, code, type, broker, stocks: [], dividends: [] });
-    toast('Portfolio created!', 'success');
-  }
-
-  save();
-  closeModal('portfolio-modal');
-  render();
+  const btn = document.getElementById('pf-save-btn'); btn.disabled = true;
+  try {
+    if (editId) {
+      const u = await apiFetch(`/api/portfolios/${editId}`, { method:'PATCH', body: JSON.stringify({name,code,type,broker}) });
+      const idx = portfolios.findIndex(p => p.id===editId);
+      portfolios[idx] = { ...portfolios[idx], ...u };
+      toast('Portfolio updated.', 'success');
+    } else {
+      const pf = await apiFetch('/api/portfolios', { method:'POST', body: JSON.stringify({name,code,type,broker}) });
+      portfolios.push(pf);
+      toast('Portfolio created!', 'success');
+    }
+    closeModal('portfolio-modal');
+    renderPortfolioGrid();
+    if (activeId) renderStocksPanel();
+  } catch(e) { document.getElementById('pf-error').textContent = e.message; }
+  finally { btn.disabled = false; }
 }
 
 function confirmDeletePortfolio(id) {
-  const pf = state.portfolios.find(p => p.id === id);
+  const pf = portfolios.find(p => p.id===id);
   document.getElementById('confirm-title').textContent = 'DELETE PORTFOLIO';
   document.getElementById('confirm-msg').textContent   = `Delete "${pf.name}" and all its holdings?`;
   document.getElementById('confirm-ok-btn').onclick    = () => deletePortfolio(id);
   document.getElementById('confirm-modal').classList.remove('hidden');
 }
 
-function deletePortfolio(id) {
-  state.portfolios = state.portfolios.filter(p => p.id !== id);
-  if (state.activeId === id) state.activeId = null;
-  save();
-  closeModal('confirm-modal');
-  toast('Portfolio deleted.', 'info');
-  render();
+async function deletePortfolio(id) {
+  try {
+    await apiFetch(`/api/portfolios/${id}`, { method:'DELETE' });
+    portfolios = portfolios.filter(p => p.id!==id);
+    if (activeId===id) { activeId=null; document.getElementById('stocks-divider').style.display='none'; document.getElementById('stocks-section').style.display='none'; }
+    closeModal('confirm-modal'); toast('Portfolio deleted.', 'info'); renderPortfolioGrid();
+  } catch(e) { toast('Delete failed: '+e.message, 'error'); }
 }
 
-/* ─── Stock CRUD ──────────────────────────────────────────── */
+// ── Stock CRUD ─────────────────────────────────────────────────────────────────
 function openAddStockModal() {
   document.getElementById('stock-modal-title').textContent = 'ADD STOCK';
   document.getElementById('st-edit-id').value = '';
-  ['st-code','st-company','st-qty','st-sale-qty','st-cost','st-mkt','st-lock'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
+  document.getElementById('st-code').value = '';
+  document.getElementById('st-company').value = '';
+  document.getElementById('st-qty').value = '';
+  document.getElementById('st-cost').value = '';
+  document.getElementById('st-mkt').value = '';
   document.getElementById('st-sector').value = '';
   document.getElementById('st-error').textContent = '';
   document.getElementById('st-preview').textContent = '';
+  
+  // Populate stock picker
+  const select = document.getElementById('st-code');
+  select.innerHTML = '<option value="">— Select Stock —</option>';
+  allStocks.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.code;
+    opt.textContent = s.code;
+    select.appendChild(opt);
+  });
+  
   document.getElementById('stock-modal').classList.remove('hidden');
-  document.getElementById('st-code').focus();
-
-  // Live preview
-  ['st-qty','st-cost','st-mkt'].forEach(id =>
-    document.getElementById(id).addEventListener('input', updateStockPreview)
-  );
+  setTimeout(() => document.getElementById('st-code').focus(), 50);
 }
 
-function updateStockPreview() {
-  const qty  = parseFloat(document.getElementById('st-qty').value) || 0;
-  const cost = parseFloat(document.getElementById('st-cost').value) || 0;
-  const mkt  = parseFloat(document.getElementById('st-mkt').value) || 0;
-  if (!qty || !cost || !mkt) { document.getElementById('st-preview').textContent = ''; return; }
-  const costAmt = qty * cost;
-  const mktVal  = qty * mkt;
-  const pl      = mktVal - costAmt;
-  const pct     = (pl / costAmt * 100).toFixed(2);
-  const sign    = pl >= 0 ? '+' : '';
-  document.getElementById('st-preview').innerHTML =
-    `Cost: ৳ ${fmt(costAmt)} | Mkt: ৳ ${fmt(mktVal)} | P&L: <span style="color:${pl>=0?'var(--gain)':'var(--loss)'}">${sign}৳ ${fmt(pl)} (${sign}${pct}%)</span>`;
+function onStockCodeChanged() {
+  const code = document.getElementById('st-code').value;
+  const stock = allStocks.find(s => s.code === code);
+  
+  if (stock) {
+    document.getElementById('st-company').value = stock.name;
+    document.getElementById('st-mkt').value = stock.ltp.toFixed(2);
+    document.getElementById('st-sector').value = getSectorForStock(code) || 'OTHER';
+  } else {
+    document.getElementById('st-company').value = '';
+    document.getElementById('st-mkt').value = '';
+    document.getElementById('st-sector').value = '';
+  }
+  updateStockPreview();
+}
+
+function getSectorForStock(code) {
+  const sectorMap = {
+    'GPHL': 'ENGINEERING', 'WALTON': 'ENGINEERING',
+    'GRAMEENPHONE': 'TELECOMMUNICATION',
+    'EBL': 'BANK', 'BRAC': 'BANK', 'DBBL': 'BANK', 'CITY': 'BANK', 'DUTCHBANLA': 'BANK',
+    'CEMCO': 'CEMENT', 'LAFARGEHOLCIM': 'CEMENT',
+    'SQURE': 'PHARMACEUTICALS CHEMICAL', 'BEXIMCO': 'PHARMACEUTICALS CHEMICAL',
+  };
+  
+  for (const [key, sector] of Object.entries(sectorMap)) {
+    if (code.includes(key.toUpperCase())) return sector;
+  }
+  return null;
 }
 
 function openEditStockModal(id) {
-  const pf = getActive();
-  const st = pf.stocks.find(s => s.id === id);
+  const st = getActive().stocks.find(s => s.id===id);
   document.getElementById('stock-modal-title').textContent = 'EDIT STOCK';
-  document.getElementById('st-edit-id').value      = st.id;
-  document.getElementById('st-code').value         = st.code;
-  document.getElementById('st-company').value      = st.company;
-  document.getElementById('st-qty').value          = st.qty;
-  document.getElementById('st-sale-qty').value     = st.saleQty !== undefined ? st.saleQty : '';
-  document.getElementById('st-cost').value         = st.cost;
-  document.getElementById('st-mkt').value          = st.mktPrice;
-  document.getElementById('st-sector').value       = st.sector || '';
-  document.getElementById('st-lock').value         = st.lock || '';
-  document.getElementById('st-error').textContent  = '';
+  document.getElementById('st-edit-id').value   = st.id;
+  
+  const select = document.getElementById('st-code');
+  select.innerHTML = '<option value="">— Select Stock —</option>';
+  allStocks.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.code;
+    opt.textContent = s.code;
+    select.appendChild(opt);
+  });
+  select.value = st.code;
+  
+  document.getElementById('st-company').value   = st.company;
+  document.getElementById('st-qty').value       = st.qty;
+  document.getElementById('st-cost').value      = st.cost;
+  document.getElementById('st-mkt').value       = st.mktPrice;
+  document.getElementById('st-sector').value    = st.sector||'';
+  document.getElementById('st-error').textContent = '';
   updateStockPreview();
   document.getElementById('stock-modal').classList.remove('hidden');
 }
 
-function saveStock() {
-  const code    = document.getElementById('st-code').value.trim().toUpperCase();
-  const company = document.getElementById('st-company').value.trim();
-  const qty     = parseFloat(document.getElementById('st-qty').value);
-  const saleQty = parseFloat(document.getElementById('st-sale-qty').value) || 0;
-  const cost    = parseFloat(document.getElementById('st-cost').value);
-  const mkt     = parseFloat(document.getElementById('st-mkt').value);
-  const sector  = document.getElementById('st-sector').value;
-  const lock    = parseFloat(document.getElementById('st-lock').value) || 0;
-  const editId  = document.getElementById('st-edit-id').value;
+function updateStockPreview() {
+  const qty=parseFloat(document.getElementById('st-qty').value)||0;
+  const cost=parseFloat(document.getElementById('st-cost').value)||0;
+  const mkt=parseFloat(document.getElementById('st-mkt').value)||0;
+  if (!qty||!cost||!mkt) { document.getElementById('st-preview').textContent=''; return; }
+  const pl=(mkt-cost)*qty, pct=(pl/(cost*qty)*100).toFixed(2), s=pl>=0?'+':'';
+  document.getElementById('st-preview').innerHTML=`Cost: ৳ ${fmt(cost*qty)} | Mkt: ৳ ${fmt(mkt*qty)} | P&L: <span style="color:${pl>=0?'var(--gain)':'var(--loss)'}">${s}৳ ${fmt(pl)} (${s}${pct}%)</span>`;
+}
 
-  if (!code)    { document.getElementById('st-error').textContent = 'Stock code required.'; return; }
-  if (!company) { document.getElementById('st-error').textContent = 'Company name required.'; return; }
-  if (isNaN(qty) || qty < 0) { document.getElementById('st-error').textContent = 'Valid quantity required.'; return; }
-  if (isNaN(cost) || cost < 0) { document.getElementById('st-error').textContent = 'Valid cost required.'; return; }
-  if (isNaN(mkt) || mkt < 0)  { document.getElementById('st-error').textContent = 'Valid market price required.'; return; }
+async function saveStock() {
+  const code   = document.getElementById('st-code').value.trim().toUpperCase();
+  const company= document.getElementById('st-company').value.trim();
+  const qty    = parseFloat(document.getElementById('st-qty').value);
+  const cost   = parseFloat(document.getElementById('st-cost').value);
+  const mkt    = parseFloat(document.getElementById('st-mkt').value);
+  const sector = document.getElementById('st-sector').value;
+  const editId = document.getElementById('st-edit-id').value;
 
-  const pf = getActive();
+  if (!code)              { document.getElementById('st-error').textContent='Stock code required.'; return; }
+  if (!company)           { document.getElementById('st-error').textContent='Company name required.'; return; }
+  if (isNaN(qty)||qty<0)  { document.getElementById('st-error').textContent='Valid quantity required.'; return; }
+  if (isNaN(cost)||cost<0){ document.getElementById('st-error').textContent='Valid cost required.'; return; }
+  if (isNaN(mkt)||mkt<0)  { document.getElementById('st-error').textContent='Valid market price required.'; return; }
 
-  if (editId) {
-    const st = pf.stocks.find(s => s.id === editId);
-    Object.assign(st, { code, company, qty, saleQty, cost, mktPrice: mkt, sector, lock });
-    toast('Stock updated.', 'success');
-  } else {
-    pf.stocks.push({ id: uid(), code, company, qty, saleQty, cost, mktPrice: mkt, sector, lock });
-    toast(`${code} added!`, 'success');
-  }
-
-  save();
-  closeModal('stock-modal');
-  renderStocksPanel();
-  renderPortfolioGrid();
+  const pf=getActive(), btn=document.getElementById('st-save-btn'); btn.disabled=true;
+  try {
+    const body=JSON.stringify({code,company,qty,cost,mktPrice:mkt,sector});
+    if (editId) {
+      const u=await apiFetch(`/api/portfolios/${pf.id}/stocks/${editId}`,{method:'PATCH',body});
+      const idx=pf.stocks.findIndex(s=>s.id===editId); pf.stocks[idx]=u;
+      toast('Stock updated.','success');
+    } else {
+      const st=await apiFetch(`/api/portfolios/${pf.id}/stocks`,{method:'POST',body});
+      pf.stocks.push(st); toast(`${code} added!`,'success');
+    }
+    closeModal('stock-modal'); renderStocksPanel(); renderPortfolioGrid();
+  } catch(e) { document.getElementById('st-error').textContent=e.message; }
+  finally { btn.disabled=false; }
 }
 
 function confirmDeleteStock(id) {
-  const pf = getActive();
-  const st = pf.stocks.find(s => s.id === id);
-  document.getElementById('confirm-title').textContent = 'DELETE STOCK';
-  document.getElementById('confirm-msg').textContent   = `Remove ${st.code} — ${st.company} from portfolio?`;
-  document.getElementById('confirm-ok-btn').onclick    = () => deleteStock(id);
+  const st=getActive().stocks.find(s=>s.id===id);
+  document.getElementById('confirm-title').textContent='DELETE STOCK';
+  document.getElementById('confirm-msg').textContent=`Remove ${st.code} — ${st.company}?`;
+  document.getElementById('confirm-ok-btn').onclick=()=>deleteStock(id);
   document.getElementById('confirm-modal').classList.remove('hidden');
 }
 
-function deleteStock(id) {
-  const pf = getActive();
-  pf.stocks = pf.stocks.filter(s => s.id !== id);
-  save();
-  closeModal('confirm-modal');
-  toast('Stock removed.', 'info');
-  renderStocksPanel();
-  renderPortfolioGrid();
+async function deleteStock(id) {
+  const pf=getActive();
+  try {
+    await apiFetch(`/api/portfolios/${pf.id}/stocks/${id}`,{method:'DELETE'});
+    pf.stocks=pf.stocks.filter(s=>s.id!==id);
+    closeModal('confirm-modal'); toast('Stock removed.','info'); renderStocksPanel(); renderPortfolioGrid();
+  } catch(e) { toast('Delete failed: '+e.message,'error'); }
 }
 
-/* ─── Dividend CRUD ───────────────────────────────────────── */
+// ── Dividend CRUD ──────────────────────────────────────────────────────────────
 function openAddDividendModal() {
-  document.getElementById('dividend-modal-title').textContent = 'ADD DIVIDEND';
-  document.getElementById('dv-edit-id').value = '';
-  ['dv-company','dv-holdings','dv-rate','dv-date'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('dv-type').value = 'CASH';
-  document.getElementById('dv-error').textContent = '';
+  document.getElementById('dividend-modal-title').textContent='ADD DIVIDEND';
+  document.getElementById('dv-edit-id').value='';
+  ['dv-company','dv-holdings','dv-rate','dv-date'].forEach(x=>document.getElementById(x).value='');
+  document.getElementById('dv-type').value='CASH';
+  document.getElementById('dv-error').textContent='';
   document.getElementById('dividend-modal').classList.remove('hidden');
-  document.getElementById('dv-company').focus();
+  setTimeout(()=>document.getElementById('dv-company').focus(),50);
 }
 
 function openEditDividendModal(id) {
-  const pf = getActive();
-  const dv = pf.dividends.find(d => d.id === id);
-  document.getElementById('dividend-modal-title').textContent = 'EDIT DIVIDEND';
-  document.getElementById('dv-edit-id').value   = dv.id;
-  document.getElementById('dv-company').value   = dv.company;
-  document.getElementById('dv-type').value      = dv.type;
-  document.getElementById('dv-holdings').value  = dv.holdings;
-  document.getElementById('dv-rate').value      = dv.rate;
-  document.getElementById('dv-date').value      = dv.date || '';
-  document.getElementById('dv-error').textContent = '';
+  const dv=(getActive().dividends||[]).find(d=>d.id===id);
+  document.getElementById('dividend-modal-title').textContent='EDIT DIVIDEND';
+  document.getElementById('dv-edit-id').value  =dv.id;
+  document.getElementById('dv-company').value  =dv.company;
+  document.getElementById('dv-type').value     =dv.type;
+  document.getElementById('dv-holdings').value =dv.holdings;
+  document.getElementById('dv-rate').value     =dv.rate;
+  document.getElementById('dv-date').value     =dv.date||'';
+  document.getElementById('dv-error').textContent='';
   document.getElementById('dividend-modal').classList.remove('hidden');
 }
 
-function saveDividend() {
-  const company  = document.getElementById('dv-company').value.trim();
-  const type     = document.getElementById('dv-type').value;
-  const holdings = parseFloat(document.getElementById('dv-holdings').value);
-  const rate     = parseFloat(document.getElementById('dv-rate').value);
-  const date     = document.getElementById('dv-date').value;
-  const editId   = document.getElementById('dv-edit-id').value;
+async function saveDividend() {
+  const company =document.getElementById('dv-company').value.trim();
+  const type    =document.getElementById('dv-type').value;
+  const holdings=parseFloat(document.getElementById('dv-holdings').value);
+  const rate    =parseFloat(document.getElementById('dv-rate').value);
+  const date    =document.getElementById('dv-date').value;
+  const editId  =document.getElementById('dv-edit-id').value;
 
-  if (!company)       { document.getElementById('dv-error').textContent = 'Company name required.'; return; }
-  if (isNaN(holdings)) { document.getElementById('dv-error').textContent = 'Valid holdings required.'; return; }
-  if (isNaN(rate))     { document.getElementById('dv-error').textContent = 'Valid rate required.'; return; }
+  if (!company)        { document.getElementById('dv-error').textContent='Company name required.'; return; }
+  if (isNaN(holdings)) { document.getElementById('dv-error').textContent='Valid holdings required.'; return; }
+  if (isNaN(rate))     { document.getElementById('dv-error').textContent='Valid rate required.'; return; }
 
-  const pf = getActive();
-  if (!pf.dividends) pf.dividends = [];
-
-  if (editId) {
-    const dv = pf.dividends.find(d => d.id === editId);
-    Object.assign(dv, { company, type, holdings, rate, date });
-    toast('Dividend updated.', 'success');
-  } else {
-    pf.dividends.push({ id: uid(), company, type, holdings, rate, date });
-    toast('Dividend added!', 'success');
-  }
-
-  save();
-  closeModal('dividend-modal');
-  renderDividends();
+  const pf=getActive(), btn=document.getElementById('dv-save-btn'); btn.disabled=true;
+  try {
+    const body=JSON.stringify({company,type,holdings,rate,date});
+    if (editId) {
+      const u=await apiFetch(`/api/portfolios/${pf.id}/dividends/${editId}`,{method:'PATCH',body});
+      const idx=(pf.dividends||[]).findIndex(d=>d.id===editId); pf.dividends[idx]=u;
+      toast('Dividend updated.','success');
+    } else {
+      const dv=await apiFetch(`/api/portfolios/${pf.id}/dividends`,{method:'POST',body});
+      if (!pf.dividends) pf.dividends=[]; pf.dividends.push(dv);
+      toast('Dividend added!','success');
+    }
+    closeModal('dividend-modal'); renderDividends();
+  } catch(e) { document.getElementById('dv-error').textContent=e.message; }
+  finally { btn.disabled=false; }
 }
 
 function confirmDeleteDividend(id) {
-  const pf = getActive();
-  const dv = pf.dividends.find(d => d.id === id);
-  document.getElementById('confirm-title').textContent = 'DELETE DIVIDEND';
-  document.getElementById('confirm-msg').textContent   = `Remove dividend entry for "${dv.company}"?`;
-  document.getElementById('confirm-ok-btn').onclick    = () => deleteDividend(id);
+  const dv=(getActive().dividends||[]).find(d=>d.id===id);
+  document.getElementById('confirm-title').textContent='DELETE DIVIDEND';
+  document.getElementById('confirm-msg').textContent=`Remove dividend entry for "${dv.company}"?`;
+  document.getElementById('confirm-ok-btn').onclick=()=>deleteDividend(id);
   document.getElementById('confirm-modal').classList.remove('hidden');
 }
 
-function deleteDividend(id) {
-  const pf = getActive();
-  pf.dividends = pf.dividends.filter(d => d.id !== id);
-  save();
-  closeModal('confirm-modal');
-  toast('Dividend removed.', 'info');
-  renderDividends();
+async function deleteDividend(id) {
+  const pf=getActive();
+  try {
+    await apiFetch(`/api/portfolios/${pf.id}/dividends/${id}`,{method:'DELETE'});
+    pf.dividends=(pf.dividends||[]).filter(d=>d.id!==id);
+    closeModal('confirm-modal'); toast('Dividend removed.','info'); renderDividends();
+  } catch(e) { toast('Delete failed: '+e.message,'error'); }
 }
 
-/* ─── Helpers ─────────────────────────────────────────────── */
-function getActive() { return state.portfolios.find(p => p.id === state.activeId); }
-
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function getActive() { return portfolios.find(p=>p.id===activeId); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmt(n,dec=2) { return isNaN(n)?'0.00':parseFloat(n).toLocaleString('en-IN',{minimumFractionDigits:dec,maximumFractionDigits:dec}); }
 
-function esc(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function toast(msg,type='info') {
+  const wrap=document.getElementById('toast-wrap');
+  const el=document.createElement('div'); el.className=`toast ${type}`;
+  const icon=type==='success'?'<polyline points="20 6 9 17 4 12"/>':type==='error'?'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>':'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+  el.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${icon}</svg> ${esc(msg)}`;
+  wrap.appendChild(el); setTimeout(()=>el.remove(),3000);
 }
 
-function fmt(n, dec=2) {
-  if (isNaN(n)) return '0.00';
-  return parseFloat(n).toLocaleString('en-IN', { minimumFractionDigits: dec, maximumFractionDigits: dec });
-}
-
-let _toastTimer = {};
-function toast(msg, type='info') {
-  const wrap = document.getElementById('toast-wrap');
-  const el   = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-    ${type==='success' ? '<polyline points="20 6 9 17 4 12"/>' : type==='error' ? '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>' : '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'}
-  </svg> ${esc(msg)}`;
-  wrap.appendChild(el);
-  setTimeout(() => el.remove(), 3000);
-}
-
-// Close modals on backdrop click
 document.querySelectorAll('.modal-backdrop').forEach(bd => {
-  bd.addEventListener('click', e => { if (e.target === bd) bd.classList.add('hidden'); });
+  bd.addEventListener('click', e => { if(e.target===bd) bd.classList.add('hidden'); });
 });
-
-// Keyboard shortcuts
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.add('hidden'));
+  if(e.key==='Escape') document.querySelectorAll('.modal-backdrop').forEach(m=>m.classList.add('hidden'));
 });
 
-// If there's an active portfolio from last session, show it
-if (state.activeId && state.portfolios.find(p => p.id === state.activeId)) {
-  document.getElementById('stocks-divider').style.display = '';
-  document.getElementById('stocks-section').style.display = '';
-  renderStocksPanel();
-}
+init();
 </script>
 </body>
 </html>

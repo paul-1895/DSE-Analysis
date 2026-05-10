@@ -10,7 +10,7 @@ const app = express();
 const PORT = 3000;
 
 app.use(cors());
-app.use(express.json()); // if not already there
+app.use(express.json());
 app.use('/api/financials', financialsRouter);
 app.use(express.json());
 app.use(express.static('.'));
@@ -101,6 +101,184 @@ app.delete('/api/watchlists/:id/stocks/:code', (req, res) => {
   res.json(wl);
 });
 
+// ─── PORTFOLIO FILE ───────────────────────────────────────────────────────────
+const PORTFOLIO_FILE = path.join(__dirname, 'portfolios.json');
+
+function readPortfolios() {
+  try {
+    if (!fs.existsSync(PORTFOLIO_FILE)) {
+      fs.writeFileSync(PORTFOLIO_FILE, JSON.stringify({ portfolios: [] }, null, 2));
+    }
+    const raw = fs.readFileSync(PORTFOLIO_FILE, 'utf-8');
+    return JSON.parse(raw);
+  } catch (e) {
+    return { portfolios: [] };
+  }
+}
+
+function savePortfolios(data) {
+  fs.writeFileSync(PORTFOLIO_FILE, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+// GET all portfolios
+app.get('/api/portfolios', (req, res) => {
+  res.json(readPortfolios());
+});
+
+// POST create portfolio
+app.post('/api/portfolios', (req, res) => {
+  const { name, code, type, broker } = req.body;
+  if (!name || !name.trim()) return res.status(400).json({ error: 'Name required' });
+  const data = readPortfolios();
+  const pf = {
+    id:        Date.now().toString(),
+    name:      name.trim(),
+    code:      (code || '').trim(),
+    type:      type || 'CASH',
+    broker:    (broker || '').trim(),
+    stocks:    [],
+    dividends: [],
+    createdAt: new Date().toISOString()
+  };
+  data.portfolios.push(pf);
+  savePortfolios(data);
+  res.json(pf);
+});
+
+// PATCH update portfolio meta
+app.patch('/api/portfolios/:id', (req, res) => {
+  const { name, code, type, broker } = req.body;
+  const data = readPortfolios();
+  const pf = data.portfolios.find(p => p.id === req.params.id);
+  if (!pf) return res.status(404).json({ error: 'Not found' });
+  if (name && name.trim()) pf.name   = name.trim();
+  if (code  !== undefined)  pf.code   = code.trim();
+  if (type  !== undefined)  pf.type   = type;
+  if (broker !== undefined) pf.broker = broker.trim();
+  savePortfolios(data);
+  res.json(pf);
+});
+
+// DELETE portfolio
+app.delete('/api/portfolios/:id', (req, res) => {
+  const data = readPortfolios();
+  const idx = data.portfolios.findIndex(p => p.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  data.portfolios.splice(idx, 1);
+  savePortfolios(data);
+  res.json({ ok: true });
+});
+
+// POST add stock to portfolio
+app.post('/api/portfolios/:id/stocks', (req, res) => {
+  const { code, company, qty, saleQty, cost, mktPrice, sector, lock } = req.body;
+  if (!code || !company) return res.status(400).json({ error: 'code and company required' });
+  if (qty === undefined || cost === undefined || mktPrice === undefined)
+    return res.status(400).json({ error: 'qty, cost and mktPrice required' });
+  const data = readPortfolios();
+  const pf = data.portfolios.find(p => p.id === req.params.id);
+  if (!pf) return res.status(404).json({ error: 'Not found' });
+  const stock = {
+    id:       Date.now().toString(),
+    code:     code.toUpperCase().trim(),
+    company:  company.trim(),
+    qty:      parseFloat(qty)      || 0,
+    saleQty:  parseFloat(saleQty)  || 0,
+    cost:     parseFloat(cost)     || 0,
+    mktPrice: parseFloat(mktPrice) || 0,
+    sector:   (sector || '').trim(),
+    lock:     parseFloat(lock)     || 0,
+    addedAt:  new Date().toISOString()
+  };
+  pf.stocks.push(stock);
+  savePortfolios(data);
+  res.json(stock);
+});
+
+// PATCH update a stock inside a portfolio
+app.patch('/api/portfolios/:id/stocks/:stockId', (req, res) => {
+  const { code, company, qty, saleQty, cost, mktPrice, sector, lock } = req.body;
+  const data = readPortfolios();
+  const pf = data.portfolios.find(p => p.id === req.params.id);
+  if (!pf) return res.status(404).json({ error: 'Portfolio not found' });
+  const st = pf.stocks.find(s => s.id === req.params.stockId);
+  if (!st) return res.status(404).json({ error: 'Stock not found' });
+  if (code     !== undefined) st.code     = code.toUpperCase().trim();
+  if (company  !== undefined) st.company  = company.trim();
+  if (qty      !== undefined) st.qty      = parseFloat(qty)      || 0;
+  if (saleQty  !== undefined) st.saleQty  = parseFloat(saleQty)  || 0;
+  if (cost     !== undefined) st.cost     = parseFloat(cost)     || 0;
+  if (mktPrice !== undefined) st.mktPrice = parseFloat(mktPrice) || 0;
+  if (sector   !== undefined) st.sector   = sector.trim();
+  if (lock     !== undefined) st.lock     = parseFloat(lock)     || 0;
+  savePortfolios(data);
+  res.json(st);
+});
+
+// DELETE stock from portfolio
+app.delete('/api/portfolios/:id/stocks/:stockId', (req, res) => {
+  const data = readPortfolios();
+  const pf = data.portfolios.find(p => p.id === req.params.id);
+  if (!pf) return res.status(404).json({ error: 'Not found' });
+  const before = pf.stocks.length;
+  pf.stocks = pf.stocks.filter(s => s.id !== req.params.stockId);
+  if (pf.stocks.length === before) return res.status(404).json({ error: 'Stock not found' });
+  savePortfolios(data);
+  res.json({ ok: true });
+});
+
+// POST add dividend to portfolio
+app.post('/api/portfolios/:id/dividends', (req, res) => {
+  const { company, type, holdings, rate, date } = req.body;
+  if (!company || holdings === undefined || rate === undefined)
+    return res.status(400).json({ error: 'company, holdings and rate required' });
+  const data = readPortfolios();
+  const pf = data.portfolios.find(p => p.id === req.params.id);
+  if (!pf) return res.status(404).json({ error: 'Not found' });
+  if (!pf.dividends) pf.dividends = [];
+  const div = {
+    id:       Date.now().toString(),
+    company:  company.trim(),
+    type:     type || 'CASH',
+    holdings: parseFloat(holdings) || 0,
+    rate:     parseFloat(rate)     || 0,
+    date:     date || '',
+    addedAt:  new Date().toISOString()
+  };
+  pf.dividends.push(div);
+  savePortfolios(data);
+  res.json(div);
+});
+
+// PATCH update a dividend
+app.patch('/api/portfolios/:id/dividends/:divId', (req, res) => {
+  const { company, type, holdings, rate, date } = req.body;
+  const data = readPortfolios();
+  const pf = data.portfolios.find(p => p.id === req.params.id);
+  if (!pf) return res.status(404).json({ error: 'Portfolio not found' });
+  const dv = (pf.dividends || []).find(d => d.id === req.params.divId);
+  if (!dv) return res.status(404).json({ error: 'Dividend not found' });
+  if (company  !== undefined) dv.company  = company.trim();
+  if (type     !== undefined) dv.type     = type;
+  if (holdings !== undefined) dv.holdings = parseFloat(holdings) || 0;
+  if (rate     !== undefined) dv.rate     = parseFloat(rate)     || 0;
+  if (date     !== undefined) dv.date     = date;
+  savePortfolios(data);
+  res.json(dv);
+});
+
+// DELETE dividend
+app.delete('/api/portfolios/:id/dividends/:divId', (req, res) => {
+  const data = readPortfolios();
+  const pf = data.portfolios.find(p => p.id === req.params.id);
+  if (!pf) return res.status(404).json({ error: 'Not found' });
+  const before = (pf.dividends || []).length;
+  pf.dividends = (pf.dividends || []).filter(d => d.id !== req.params.divId);
+  if (pf.dividends.length === before) return res.status(404).json({ error: 'Dividend not found' });
+  savePortfolios(data);
+  res.json({ ok: true });
+});
+
 // ─── DSE SCRAPER ─────────────────────────────────────────────────────────────
 let cache = null;
 let cacheTime = 0;
@@ -158,24 +336,11 @@ app.get('/api/stocks', async (req, res) => {
   }
 });
 
-// ============================================================
-// NEWS API ROUTES — Add these to your server.js
-// Place BEFORE your app.listen() call
-// ============================================================
-
-// Required: add these requires at the top of server.js
-// const path = require('path');
-// const fs   = require('fs');
-
-// ---- helpers -----------------------------------------------
-
+// ─── NEWS ─────────────────────────────────────────────────────────────────────
 const NEWS_DIR = path.join(__dirname, 'news');
-
-// Ensure news directory exists
 if (!fs.existsSync(NEWS_DIR)) fs.mkdirSync(NEWS_DIR);
 
 function newsFilePath(code) {
-  // Sanitise code so it can safely be a filename
   const safe = code.replace(/[^A-Za-z0-9_-]/g, '').toUpperCase();
   return path.join(NEWS_DIR, `${safe}.json`);
 }
@@ -191,56 +356,39 @@ function writeNews(code, items) {
   fs.writeFileSync(newsFilePath(code), JSON.stringify(items, null, 2), 'utf8');
 }
 
-// ---- fetch Open-Graph / meta preview -----------------------
-
 const https = require('https');
 const http  = require('http');
 
 function fetchPreview(url) {
   return new Promise((resolve) => {
     const timeout = setTimeout(() => resolve(null), 8000);
-
     const client = url.startsWith('https') ? https : http;
     client.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (DSE-Analysis link-preview bot)' } }, (res) => {
-      // Follow one redirect
       if ((res.statusCode === 301 || res.statusCode === 302) && res.headers.location) {
         clearTimeout(timeout);
         return fetchPreview(res.headers.location).then(resolve);
       }
-
       let html = '';
       res.setEncoding('utf8');
-      res.on('data', chunk => {
-        html += chunk;
-        if (html.length > 200_000) res.destroy(); // don't download megabytes
-      });
+      res.on('data', chunk => { html += chunk; if (html.length > 200_000) res.destroy(); });
       res.on('end', () => {
         clearTimeout(timeout);
         const extract = (pattern) => { const m = html.match(pattern); return m ? m[1].trim() : null; };
-
         const title =
           extract(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i) ||
           extract(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i) ||
-          extract(/<title[^>]*>([^<]+)<\/title>/i) ||
-          null;
-
+          extract(/<title[^>]*>([^<]+)<\/title>/i) || null;
         const description =
           extract(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i) ||
           extract(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i) ||
           extract(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i) ||
-          extract(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i) ||
-          null;
-
+          extract(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i) || null;
         const image =
           extract(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
-          extract(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i) ||
-          null;
-
+          extract(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i) || null;
         const siteName =
           extract(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']+)["']/i) ||
-          extract(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:site_name["']/i) ||
-          null;
-
+          extract(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:site_name["']/i) || null;
         resolve({ title, description, image, siteName });
       });
       res.on('error', () => { clearTimeout(timeout); resolve(null); });
@@ -248,49 +396,31 @@ function fetchPreview(url) {
   });
 }
 
-// ---- routes ------------------------------------------------
-
-// GET  /api/news/:code          → list all news for a stock
 app.get('/api/news/:code', (req, res) => {
-  const items = readNews(req.params.code);
-  res.json({ items });
+  res.json({ items: readNews(req.params.code) });
 });
 
-// POST /api/news/:code          → add a news link
-// Body: { url: "https://..." }
 app.post('/api/news/:code', express.json(), async (req, res) => {
   const { code } = req.params;
   const { url }  = req.body || {};
-
-  if (!url || !/^https?:\/\//i.test(url)) {
-    return res.status(400).json({ error: 'Invalid URL' });
-  }
-
+  if (!url || !/^https?:\/\//i.test(url)) return res.status(400).json({ error: 'Invalid URL' });
   const items = readNews(code);
-
-  // Duplicate guard
-  if (items.some(i => i.url === url)) {
-    return res.status(409).json({ error: 'URL already saved' });
-  }
-
+  if (items.some(i => i.url === url)) return res.status(409).json({ error: 'URL already saved' });
   const preview = await fetchPreview(url);
-
   const item = {
-    id:        Date.now().toString(),
+    id:          Date.now().toString(),
     url,
-    addedAt:   new Date().toISOString(),
-    title:     preview?.title       || null,
+    addedAt:     new Date().toISOString(),
+    title:       preview?.title       || null,
     description: preview?.description || null,
-    image:     preview?.image       || null,
-    siteName:  preview?.siteName    || null,
+    image:       preview?.image       || null,
+    siteName:    preview?.siteName    || null,
   };
-
-  items.unshift(item);   // newest first
+  items.unshift(item);
   writeNews(code, items);
   res.json({ item });
 });
 
-// DELETE /api/news/:code/:id    → remove one link by id
 app.delete('/api/news/:code/:id', (req, res) => {
   const { code, id } = req.params;
   let items = readNews(code);
@@ -301,7 +431,9 @@ app.delete('/api/news/:code/:id', (req, res) => {
   res.json({ ok: true });
 });
 
+// ─── START ────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`DSE server running on http://localhost:${PORT}`);
-  console.log(`Watchlist stored at: ${WATCHLIST_FILE}`);
+  console.log(`Watchlist stored at:  ${WATCHLIST_FILE}`);
+  console.log(`Portfolios stored at: ${PORTFOLIO_FILE}`);
 });
