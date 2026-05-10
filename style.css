@@ -1,9 +1,10 @@
 /* ============================================
    DSE LIVE MARKET TRACKER — STYLESHEET
-   Aesthetic: Dark Financial Terminal
+   Aesthetic: Dark Financial Terminal + Light Mode
    ============================================ */
 
 :root {
+  /* Dark mode (default) */
   --bg-base:      #0a0c10;
   --bg-surface:   #111318;
   --bg-card:      #161b24;
@@ -35,6 +36,47 @@
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
+
+  --thead-bg-from: #161e2e;
+  --thead-bg-to:   #111723;
+  --header-bg-from: #0d1117;
+}
+
+/* ---- LIGHT MODE ---- */
+[data-theme="light"] {
+  --bg-base:      #f0f4f8;
+  --bg-surface:   #e8edf4;
+  --bg-card:      #ffffff;
+  --bg-hover:     #eef2f8;
+  --border:       #d0d9e6;
+  --border-glow:  #a8bcdb;
+
+  --text-primary: #0f1923;
+  --text-secondary:#4a5e78;
+  --text-muted:   #8fa3bc;
+
+  --accent:       #007a63;
+  --accent-dim:   rgba(0, 122, 99, 0.08);
+  --accent-glow:  rgba(0, 122, 99, 0.20);
+
+  --gain:         #16803a;
+  --gain-bg:      rgba(22, 128, 58, 0.08);
+  --loss:         #c41a1a;
+  --loss-bg:      rgba(196, 26, 26, 0.08);
+  --neutral:      #6b7f96;
+  --neutral-bg:   rgba(107, 127, 150, 0.08);
+
+  --gold:         #b45309;
+  --gold-bg:      rgba(180, 83, 9, 0.08);
+
+  --thead-bg-from: #e4ecf7;
+  --thead-bg-to:   #dce6f2;
+  --header-bg-from: #e8edf4;
+}
+
+/* Smooth theme transitions */
+*, *::before, *::after {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.15s ease;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -50,14 +92,14 @@ body {
   min-height: 100vh;
   /* Subtle grid texture */
   background-image:
-    linear-gradient(rgba(0,212,170,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,212,170,0.015) 1px, transparent 1px);
+    linear-gradient(var(--accent-dim) 1px, transparent 1px),
+    linear-gradient(90deg, var(--accent-dim) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
 /* ---- HEADER ---- */
 .site-header {
-  background: linear-gradient(180deg, #0d1117 0%, var(--bg-base) 100%);
+  background: linear-gradient(180deg, var(--header-bg-from) 0%, var(--bg-base) 100%);
   border-bottom: 1px solid var(--border);
   padding: 18px 24px;
   position: sticky;
@@ -418,7 +460,7 @@ body {
 }
 
 #stocks-table thead tr {
-  background: linear-gradient(180deg, #161e2e 0%, #111723 100%);
+  background: linear-gradient(180deg, var(--thead-bg-from) 0%, var(--thead-bg-to) 100%);
   border-bottom: 2px solid var(--border-glow);
 }
 
@@ -532,6 +574,40 @@ body {
 }
 
 .site-footer strong { color: var(--text-secondary); }
+
+/* ---- THEME TOGGLE ---- */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  background: transparent;
+  border: 1px solid var(--border-glow);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.theme-toggle .toggle-icon {
+  font-size: 14px;
+  line-height: 1;
+  transition: transform 0.4s ease;
+}
+
+.theme-toggle:hover .toggle-icon {
+  transform: rotate(20deg);
+}
 
 /* ---- SCROLLBAR ---- */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
