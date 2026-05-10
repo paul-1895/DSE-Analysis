@@ -44,6 +44,7 @@ async function fetchAndRender() {
     finData = { eps: [], dividend: [], nocfps: [], revenue: [], nav: [] };
   }
   renderAllTables();
+  if (window.renderFinancialCharts) window.renderFinancialCharts(finData);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -330,6 +331,7 @@ async function postEntry(type, body) {
     if (!res.ok) throw new Error(json.error || 'Server error');
     finData = json.data;
     renderAllTables();
+    if (window.renderFinancialCharts) window.renderFinancialCharts(finData);
     showFeedback(type, 'Saved successfully!', 'success');
   } catch (err) {
     showFeedback(type, `Error: ${err.message}`, 'error');
