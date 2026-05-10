@@ -4,11 +4,14 @@ const cheerio = require('cheerio');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const financialsRouter = require('./routes/financials');
 
 const app = express();
 const PORT = 3000;
 
 app.use(cors());
+app.use(express.json()); // if not already there
+app.use('/api/financials', financialsRouter);
 app.use(express.json());
 app.use(express.static('.'));
 

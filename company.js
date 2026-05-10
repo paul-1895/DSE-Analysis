@@ -147,6 +147,7 @@ function populateProfile(s) {
   // Chart
   currentStockCode = s.code;
   loadTradingViewChart(s.code);
+  if (window.initFinancials) window.initFinancials(s.code);
 }
 
 /* ----------------------------------------------------------------

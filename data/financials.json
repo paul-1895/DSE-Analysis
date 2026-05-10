@@ -1,0 +1,16 @@
+{
+  "ROBI": {
+    "eps": [
+      {
+        "value": 0.6,
+        "quarter": "Q4",
+        "year": 2025,
+        "updatedAt": "2026-05-10T03:50:49.737Z"
+      }
+    ],
+    "dividend": [],
+    "nocfps": [],
+    "revenue": [],
+    "nav": []
+  }
+}

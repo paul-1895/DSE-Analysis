@@ -1,0 +1,273 @@
+/* ============================================================
+   financials.css
+   Styles for the Company Financials manual-entry section.
+   Matches the DSE Analysis site's design tokens from style.css.
+   ============================================================ */
+
+/* ── Section wrapper ────────────────────────────────────────── */
+#financials-section {
+  max-width: 1100px;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+}
+
+.fin-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* ── Header bar ─────────────────────────────────────────────── */
+.fin-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.fin-title-icon { font-size: 18px; }
+
+.fin-title {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 0;
+}
+
+.fin-subtitle {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-left: auto;
+}
+
+/* ── Tabs ───────────────────────────────────────────────────── */
+.fin-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.fin-tabs::-webkit-scrollbar { display: none; }
+
+.fin-tab-btn {
+  flex-shrink: 0;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+
+.fin-tab-btn:hover {
+  color: var(--text-secondary);
+  background: var(--accent-dim);
+}
+
+.fin-tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ── Panels ─────────────────────────────────────────────────── */
+.fin-panel { display: none; padding: 24px; }
+.fin-panel.active { display: block; }
+
+.fin-desc {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 0 0 20px;
+  letter-spacing: 0.3px;
+}
+
+/* ── Form ───────────────────────────────────────────────────── */
+.fin-form { margin-bottom: 20px; }
+
+.fin-form-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.fin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.fin-field-sm { flex: 0 0 110px; min-width: 100px; }
+
+.fin-field-btn { flex: 0 0 auto; min-width: unset; }
+
+.fin-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-muted);
+}
+
+.fin-unit {
+  color: var(--accent);
+  font-size: 9px;
+}
+
+.fin-input,
+.fin-select {
+  background: var(--bg-page, #0e1117);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.fin-input:focus,
+.fin-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.fin-input::placeholder { color: var(--text-muted); }
+
+/* Chrome removes spinner arrows; keep them for number fields */
+.fin-input[type="number"]::-webkit-inner-spin-button,
+.fin-input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.4;
+}
+
+/* ── Buttons ────────────────────────────────────────────────── */
+.fin-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.fin-btn-add {
+  padding: 9px 18px;
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.fin-btn-add:hover {
+  background: var(--accent);
+  color: #000;
+}
+
+.fin-btn-del {
+  padding: 4px 9px;
+  background: var(--loss-bg, rgba(239,68,68,0.1));
+  border-color: var(--loss, #ef4444);
+  color: var(--loss, #ef4444);
+  font-size: 11px;
+}
+
+.fin-btn-del:hover {
+  background: var(--loss, #ef4444);
+  color: #fff;
+}
+
+/* ── Feedback ───────────────────────────────────────────────── */
+.fin-feedback {
+  font-family: var(--mono);
+  font-size: 11px;
+  margin-top: 8px;
+  min-height: 16px;
+  transition: opacity 0.3s;
+}
+
+.fin-feedback-success { color: var(--gain, #22c55e); }
+.fin-feedback-error   { color: var(--loss, #ef4444); }
+
+/* ── Data table ─────────────────────────────────────────────── */
+.fin-table-wrap {
+  margin-top: 4px;
+  overflow-x: auto;
+}
+
+.fin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.fin-table thead th {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-muted);
+  padding: 8px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.fin-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.fin-table tbody tr:last-child { border-bottom: none; }
+
+.fin-table tbody tr:hover { background: var(--accent-dim); }
+
+.fin-table td {
+  padding: 11px 14px;
+  color: var(--text-secondary);
+}
+
+.fin-table td:last-child { text-align: right; }
+
+.fin-empty {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 24px 0 8px;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .fin-form-row {
+    flex-direction: column;
+  }
+  .fin-field-sm,
+  .fin-field-btn {
+    flex: 1;
+    min-width: unset;
+  }
+  .fin-subtitle { display: none; }
+}
