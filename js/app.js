@@ -201,6 +201,10 @@ document.addEventListener('DOMContentLoaded', () => {
     .getElementById('theme-toggle-btn')
     .addEventListener('click', toggleTheme);
 
+  document
+  .getElementById('search-input')
+  .addEventListener('input', filterTable);
+
   loadData();
 
   // Auto-refresh every 5 minutes
