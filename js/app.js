@@ -5,26 +5,6 @@ let filteredStocks = [];
 let currentFilter = 'all';
 let currentSort = { key: 'code', dir: 'asc' };
 
-
-
-// ─── MARKET STATUS ────────────────────────────────────────────────────────────
-function setMarketStatus() {
-  const now = new Date();
-  const bst = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }));
-  const day = bst.getDay(); // 0=Sun … 6=Sat
-  const mins = bst.getHours() * 60 + bst.getMinutes();
-  const isWeekday = day >= 0 && day <= 4; // DSE: Sun–Thu
-  const inSession = mins >= 600 && mins <= 870; // 10:00–14:30
-  const el = document.getElementById('market-status');
-  if (isWeekday && inSession) {
-    el.textContent = '● OPEN';
-    el.style.color = 'var(--gain)';
-  } else {
-    el.textContent = '○ CLOSED';
-    el.style.color = 'var(--loss)';
-  }
-}
-
 // ─── LOAD DATA ────────────────────────────────────────────────────────────────
 async function loadData() {
   document.getElementById('loading-state').classList.remove('hidden');
@@ -220,12 +200,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document
     .getElementById('theme-toggle-btn')
     .addEventListener('click', toggleTheme);
-  setMarketStatus();
+
   loadData();
 
   // Auto-refresh every 5 minutes
   setInterval(() => {
     loadData();
-    setMarketStatus();
   }, 5 * 60 * 1000);
 });

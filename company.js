@@ -1,3 +1,4 @@
+import { initTheme } from '../theme/theme.js';
 /* ================================================================
    company.js  —  Theme, market status, profile data & chart
    ================================================================ */
@@ -33,19 +34,6 @@ function initTheme() {
   const theme       = saved || (prefersDark ? 'dark' : 'light');
   document.documentElement.setAttribute('data-theme', theme);
   updateThemeButton(theme);
-}
-
-/* ----------------------------------------------------------------
-   MARKET STATUS
----------------------------------------------------------------- */
-function setMarketStatus() {
-  const bst  = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }));
-  const day  = bst.getDay();
-  const mins = bst.getHours() * 60 + bst.getMinutes();
-  const el   = document.getElementById('market-status');
-  const open = day >= 0 && day <= 4 && mins >= 600 && mins <= 870;
-  el.textContent = open ? '● OPEN' : '○ CLOSED';
-  el.style.color = open ? 'var(--gain)' : 'var(--loss)';
 }
 
 /* ----------------------------------------------------------------
@@ -205,6 +193,5 @@ function loadTradingViewChart(code) {
 ---------------------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
-  setMarketStatus();
   loadProfile();
 });
