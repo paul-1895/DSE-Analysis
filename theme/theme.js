@@ -1,11 +1,14 @@
 // ─── THEME ────────────────────────────────────────────────────────────────────
-export function toggleTheme() {
+export function toggleTheme(onThemeChange) {
   const html = document.documentElement;
   const isLight = html.getAttribute('data-theme') === 'light';
   const newTheme = isLight ? 'dark' : 'light';
   html.setAttribute('data-theme', newTheme);
   localStorage.setItem('dse-theme', newTheme);
   updateThemeButton(newTheme);
+  if (onThemeChange) {
+    onThemeChange(newTheme);
+  }
 }
 
 function updateThemeButton(theme) {

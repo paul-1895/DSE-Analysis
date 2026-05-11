@@ -212,3 +212,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadData();
   }, 5 * 60 * 1000);
 });
+window.loadData = loadData;
+window.filterTable = filterTable;
+window.setFilter = setFilter;
+window.sortTable = sortTable;
+window.toggleSort = toggleSort;
+window.goToCompany = goToCompany;
