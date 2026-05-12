@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.static('.'));
 
 // ─── WATCHLIST FILE ───────────────────────────────────────────────────────────
-const WATCHLIST_FILE = path.join(__dirname, 'watchlist.json');
+const WATCHLIST_FILE = path.join(__dirname, 'watchlist/watchlist.json');
 
 function readWatchlists() {
   try {

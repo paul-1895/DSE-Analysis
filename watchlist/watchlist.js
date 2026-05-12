@@ -387,3 +387,10 @@ document.addEventListener('DOMContentLoaded', () => {
 setInterval(() => {
   if (watchlists.length > 0) renderWatchlistPanel();
 }, 60000);
+
+window.openWatchlistPanel = openWatchlistPanel;
+window.closeWatchlistPanel = closeWatchlistPanel;
+window.showCreateInput = showCreateInput;
+window.hideCreateInput = hideCreateInput;
+window.confirmCreate = confirmCreate;
+window.toggleWlCard = toggleWlCard;
