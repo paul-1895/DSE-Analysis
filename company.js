@@ -6,7 +6,7 @@ import { initTheme, toggleTheme } from '../theme/theme.js';
 'use strict';
 
 // Shared state — also consumed by news.js
-let currentStockCode = null;
+window.currentStockCode = null;
 
 // /* ----------------------------------------------------------------
 //    THEME
@@ -133,7 +133,7 @@ function populateProfile(s) {
   dChg.style.color = dir === 'up' ? 'var(--gain)' : dir === 'dn' ? 'var(--loss)' : 'var(--neutral)';
 
   // Chart
-  currentStockCode = s.code;
+  window.currentStockCode = s.code;
   loadTradingViewChart(s.code);
   if (window.initFinancials) window.initFinancials(s.code);
 }
@@ -197,8 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
   .getElementById('theme-toggle-btn')
   .addEventListener('click', () => {
     toggleTheme(() => {
-      if (currentStockCode) {
-        loadTradingViewChart(currentStockCode);
+      if (window.currentStockCode) {
+        loadTradingViewChart(window.currentStockCode);
       }
     });
   });

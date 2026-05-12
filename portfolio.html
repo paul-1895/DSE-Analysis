@@ -426,10 +426,24 @@ async function init() {
   
   // Fetch live stock data
   await loadStockData();
-  
+
+  // Update mktPrice from live LTP for all portfolio stocks
+  applyLivePrices();
+
   document.getElementById('page-loading').style.display = 'none';
   document.getElementById('page-content').style.display = '';
   renderPortfolioGrid();
+}
+
+function applyLivePrices() {
+  if (!allStocks.length) return;
+  const ltpMap = {};
+  allStocks.forEach(s => { ltpMap[s.code] = s.ltp; });
+  portfolios.forEach(pf => {
+    (pf.stocks || []).forEach(st => {
+      if (ltpMap[st.code] !== undefined) st.mktPrice = ltpMap[st.code];
+    });
+  });
 }
 
 async function loadStockData() {
