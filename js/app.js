@@ -168,7 +168,6 @@ function renderTable(stocks) {
     return `<tr data-code="${s.code}" data-name="${escAttrApp(s.name)}" onclick="goToCompany(event,'${escAttrApp(s.code)}')" style="cursor:pointer">
       <td class="th-rank">${i + 1}</td>
       <td class="th-code"><strong>${s.code}</strong></td>
-      <td>${s.name}</td>
       <td class="th-num">৳${fmt(s.ltp)}</td>
       <td class="th-num">${s.high ? '৳' + fmt(s.high) : '—'}</td>
       <td class="th-num">${s.low ? '৳' + fmt(s.low) : '—'}</td>

@@ -296,23 +296,40 @@ async function scrapeStocks() {
   const $ = cheerio.load(html);
   const stocks = [];
 
+  // Debug: log first data row to verify indices (remove after confirming)
+  let debugDone = false;
+
   $('table.table tr').each((i, row) => {
     if (i === 0) return;
     const cells = $(row).find('td');
-    if (cells.length < 10) return;
+    if (!debugDone) {
+      cells.each((j, td) => console.log(`cell[${j}]: "${$(td).text().trim()}"`));
+      debugDone = true;
+    }
+    if (cells.length < 9) return;
     const text = (idx) => $(cells[idx]).text().trim();
-    const num = (idx) => parseFloat(text(idx).replace(/,/g, '')) || 0;
+    const num  = (idx) => parseFloat(text(idx).replace(/,/g, '')) || 0;
+
+    // The code cell (index 1) contains an <a> with the ticker;
+    // the company name is in the link text or a title attribute.
+    const codeCell = $(cells[1]);
+    const linkEl   = codeCell.find('a').first();
+    const code     = linkEl.text().trim() || text(1);
+    const name     = codeCell.attr('title')
+                  || linkEl.attr('title')
+                  || linkEl.attr('data-name')
+                  || code; // fallback: use ticker if no name found
 
     stocks.push({
-      code: text(1),
-      name: text(2),
-      ltp: num(3),
-      high: num(4),
-      low: num(5),
-      close: num(6),
-      ycp: num(7),
-      change: num(8),
-      volume: parseInt(text(9).replace(/,/g, '')) || 0
+      code,
+      name,
+      ltp:    num(2),
+      high:   num(3),
+      low:    num(4),
+      close:  num(5),
+      ycp:    num(6),
+      change: num(7),
+      volume: parseInt(text(8).replace(/,/g, '')) || 0
     });
   });
 
