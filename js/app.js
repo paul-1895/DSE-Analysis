@@ -2,6 +2,7 @@ import { initTheme, toggleTheme } from '../theme/theme.js';
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let allStocks = [];
 let filteredStocks = [];
+window.allStocksData = null; // exposed for watchlist code in index.html
 let currentFilter = 'all';
 let currentSort = { key: 'code', dir: 'asc' };
 
@@ -18,7 +19,7 @@ async function loadData() {
     const { stocks, timestamp } = await res.json();
 
     allStocks = stocks;
-    allStocksData = stocks; // expose to watchlist code in index.html
+    window.allStocksData = stocks; // expose to watchlist code in index.html
 
     document.getElementById('last-updated').textContent =
       new Date(timestamp).toLocaleTimeString('en-BD');
