@@ -338,6 +338,38 @@ function appendMessage(content, role) {
   container.scrollTop = container.scrollHeight;
 }
 
+function showTypingIndicator() {
+  const container = document.getElementById('chatbot-messages');
+  if (!container) return;
+
+  // Prevent duplicates
+  if (document.getElementById('chatbot-typing')) return;
+
+  const typingEl = document.createElement('div');
+
+  typingEl.id = 'chatbot-typing';
+  typingEl.className = 'chatbot-message chatbot-assistant chatbot-typing';
+
+  typingEl.innerHTML = `
+    <div class="typing-dots">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  `;
+
+  container.appendChild(typingEl);
+  container.scrollTop = container.scrollHeight;
+}
+
+function hideTypingIndicator() {
+  const typingEl = document.getElementById('chatbot-typing');
+
+  if (typingEl) {
+    typingEl.remove();
+  }
+}
+
 async function sendChatMessage() {
   const input = document.getElementById('chatbot-input');
   const message = input.value.trim();
@@ -348,10 +380,14 @@ async function sendChatMessage() {
 
   appendMessage(message, 'user');
 
+  showTypingIndicator();
+
   try {
     const response = await chatbot.sendMessage(message);
+    hideTypingIndicator();
     appendMessage(response, 'assistant');
   } catch (err) {
+    hideTypingIndicator();
     appendMessage(`Error: ${err.message}`, 'assistant');
   } finally {
     input.disabled = false;
