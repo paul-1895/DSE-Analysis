@@ -32,8 +32,10 @@ window.renderFinancialsChart = function (records, tabKey) {
     return;
   }
 
-  // records arrive newest-first; reverse so chart reads left→right oldest→newest
-  const data   = [...records].reverse();
+  // Sort oldest→newest: ascending year, then Q1→Q4 within each year
+  const QORDER = { Q1:0, Q2:1, Q3:2, Q4:3 };
+  const data   = [...records].sort((a, b) =>
+    (a.year - b.year) || ((QORDER[a.quarter] ?? 0) - (QORDER[b.quarter] ?? 0)));
   const meta   = FIN_CHART_META[tabKey] || { label: tabKey.toUpperCase(), unit: '' };
   const labels = data.map(r => r.quarter ? `${r.quarter} ${r.year}` : String(r.year));
   const values = data.map(r => parseFloat(r.value ?? r.eps ?? r.amount ?? r.nav ?? 0));
