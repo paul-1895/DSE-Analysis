@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="company.css" />
   <link rel="stylesheet" href="financials-modal.css" />
   <link rel="stylesheet" href="sr-levels.css" />
+  <link rel="stylesheet" href="chatbot.css" />
 </head>
 <body>
 
@@ -230,6 +231,11 @@
 </div><!-- end #profile-body -->
 
 <!-- ============================================================
+     CHATBOT CONTAINER
+     ============================================================ -->
+<div id="chatbot-container"></div>
+
+<!-- ============================================================
      FOOTER
      ============================================================ -->
 <footer class="site-footer">
@@ -239,11 +245,13 @@
 <!-- ============================================================
      SCRIPTS  (company.js first — defines currentStockCode)
      ============================================================ -->
+<script src="config.js"></script>
 <script type="module" src="company.js"></script>
 <script src="news.js"></script>
 <script src="sr-levels.js" defer></script>
 <script src="financials.js" defer></script>
 <script src="financials-chart.js" defer></script>
+<script src="chatbot.js" defer></script>
 
 </body>
 </html>

@@ -520,6 +520,22 @@ app.delete('/api/sr/:code/:type/:id', (req, res) => {
   res.json({ ok: true });
 });
 
+const { loadProjectContext } = require('./chat-context');
+
+app.post('/api/chat/context', async (req, res) => {
+  const { filePath } = req.body;
+
+  const data = await loadProjectContext(filePath);
+
+  if (!data) {
+    return res.status(404).json({
+      error: 'File not found'
+    });
+  }
+
+  res.json(data);
+});
+
 // ─── START ────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`DSE server running on http://localhost:${PORT}`);

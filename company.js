@@ -68,6 +68,7 @@ async function loadProfile() {
     document.getElementById('profile-loading').style.display = 'none';
     document.getElementById('profile-body').style.display    = 'block';
     loadNewsLinks(s.code);   // defined in news.js
+    initChatbot(s);          // Initialize chatbot with stock data
 
   } catch (err) {
     document.getElementById('profile-loading').innerHTML =
