@@ -26,6 +26,16 @@
     const data = await API('');
     srData.support    = (data.support    || []).sort((a, b) => a.price - b.price);
     srData.resistance = (data.resistance || []).sort((a, b) => a.price - b.price);
+    checkNotifications();
+  }
+
+  function checkNotifications() {
+    if (!window.DSENotif || !stockCode || !currentLTP) return;
+    const all = [
+      ...srData.support.map(e => ({ ...e, type: 'support' })),
+      ...srData.resistance.map(e => ({ ...e, type: 'resistance' })),
+    ];
+    window.DSENotif.checkSRHit(stockCode, currentLTP, all);
   }
 
   async function addLevel(type, price, note) {
