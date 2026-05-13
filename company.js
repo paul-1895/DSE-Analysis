@@ -136,6 +136,7 @@ function populateProfile(s) {
   window.currentStockCode = s.code;
   loadTradingViewChart(s.code);
   if (window.initFinancials) window.initFinancials(s.code);
+  if (window.initSRLevels) window.initSRLevels(s.code, s.ltp);
 }
 
 /* ----------------------------------------------------------------
