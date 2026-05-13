@@ -381,6 +381,13 @@ function escAttr(s) {
 // ═══════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   fetchWatchlists();
+
+  // Inject fav cells whenever app.js renders rows into the table
+  const tbody = document.getElementById('stocks-tbody');
+  if (tbody) {
+    new MutationObserver(() => injectFavCells())
+      .observe(tbody, { childList: true, subtree: true });
+  }
 });
 
 // Poll watchlist prices every 60s to keep panel fresh
@@ -398,3 +405,5 @@ window.showRename = showRename;
 window.confirmRename = confirmRename;
 window.deleteWatchlist = deleteWatchlist;
 window.removeStockFromWatchlist = removeStockFromWatchlist;
+window.injectFavCells = injectFavCells;
+window.setWatchlistStocksData = (data) => { allStocksData = data; };
