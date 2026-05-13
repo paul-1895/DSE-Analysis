@@ -394,3 +394,7 @@ window.showCreateInput = showCreateInput;
 window.hideCreateInput = hideCreateInput;
 window.confirmCreate = confirmCreate;
 window.toggleWlCard = toggleWlCard;
+window.showRename = showRename;
+window.confirmRename = confirmRename;
+window.deleteWatchlist = deleteWatchlist;
+window.removeStockFromWatchlist = removeStockFromWatchlist;
