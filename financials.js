@@ -44,7 +44,7 @@ async function fetchAndRender() {
     finData = { eps: [], dividend: [], nocfps: [], revenue: [], nav: [] };
   }
   renderAllTables();
-  if (window.renderFinancialCharts) window.renderFinancialCharts(finData);
+  if (window.renderFinancialsChart) window.renderFinancialsChart(finData.eps, 'eps');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -160,6 +160,7 @@ function buildEpsPanel() {
 <div class="fin-panel" data-panel="eps">
   <p class="fin-desc">Earnings Per Share — decimal value per quarter/year.</p>
   ${quarterlyFormHTML('eps', 'EPS Value', 'BDT')}
+  <div id="fin-chart-container" style="padding: 16px 0 8px;"></div>
   <div class="fin-table-wrap" id="table-eps"></div>
 </div>`;
 }
@@ -331,7 +332,7 @@ async function postEntry(type, body) {
     if (!res.ok) throw new Error(json.error || 'Server error');
     finData = json.data;
     renderAllTables();
-    if (window.renderFinancialCharts) window.renderFinancialCharts(finData);
+    if (window.renderFinancialsChart) window.renderFinancialsChart(finData.eps, 'eps');
     showFeedback(type, 'Saved successfully!', 'success');
   } catch (err) {
     showFeedback(type, `Error: ${err.message}`, 'error');
