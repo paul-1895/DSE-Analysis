@@ -8,6 +8,51 @@
           "code": "BRACBANK",
           "name": "73",
           "addedAt": "2026-05-10T01:39:47.548Z"
+        },
+        {
+          "code": "TRUSTBANK",
+          "name": "TRUSTBANK",
+          "addedAt": "2026-05-13T05:28:26.876Z"
+        },
+        {
+          "code": "BANKASIA",
+          "name": "BANKASIA",
+          "addedAt": "2026-05-13T05:28:35.578Z"
+        },
+        {
+          "code": "CITYBANK",
+          "name": "CITYBANK",
+          "addedAt": "2026-05-13T05:28:43.664Z"
+        },
+        {
+          "code": "DHAKABANK",
+          "name": "DHAKABANK",
+          "addedAt": "2026-05-13T05:28:50.421Z"
+        },
+        {
+          "code": "JAMUNABANK",
+          "name": "JAMUNABANK",
+          "addedAt": "2026-05-13T05:29:09.981Z"
+        },
+        {
+          "code": "NCCBANK",
+          "name": "NCCBANK",
+          "addedAt": "2026-05-13T05:29:20.597Z"
+        },
+        {
+          "code": "PRIMEBANK",
+          "name": "PRIMEBANK",
+          "addedAt": "2026-05-13T05:29:26.779Z"
+        },
+        {
+          "code": "PUBALIBANK",
+          "name": "PUBALIBANK",
+          "addedAt": "2026-05-13T05:29:30.871Z"
+        },
+        {
+          "code": "UTTARABANK",
+          "name": "UTTARABANK",
+          "addedAt": "2026-05-13T05:29:38.029Z"
         }
       ],
       "createdAt": "2026-05-10T01:36:09.492Z"
@@ -30,6 +75,51 @@
           "code": "ROBI",
           "name": "29.5",
           "addedAt": "2026-05-11T04:06:02.190Z"
+        },
+        {
+          "code": "TRUSTBANK",
+          "name": "TRUSTBANK",
+          "addedAt": "2026-05-13T05:28:28.030Z"
+        },
+        {
+          "code": "BANKASIA",
+          "name": "BANKASIA",
+          "addedAt": "2026-05-13T05:28:36.187Z"
+        },
+        {
+          "code": "CITYBANK",
+          "name": "CITYBANK",
+          "addedAt": "2026-05-13T05:28:44.264Z"
+        },
+        {
+          "code": "DHAKABANK",
+          "name": "DHAKABANK",
+          "addedAt": "2026-05-13T05:28:51.513Z"
+        },
+        {
+          "code": "JAMUNABANK",
+          "name": "JAMUNABANK",
+          "addedAt": "2026-05-13T05:29:10.680Z"
+        },
+        {
+          "code": "NCCBANK",
+          "name": "NCCBANK",
+          "addedAt": "2026-05-13T05:29:21.211Z"
+        },
+        {
+          "code": "PRIMEBANK",
+          "name": "PRIMEBANK",
+          "addedAt": "2026-05-13T05:29:27.411Z"
+        },
+        {
+          "code": "PUBALIBANK",
+          "name": "PUBALIBANK",
+          "addedAt": "2026-05-13T05:29:31.520Z"
+        },
+        {
+          "code": "UTTARABANK",
+          "name": "UTTARABANK",
+          "addedAt": "2026-05-13T05:29:39.253Z"
         }
       ],
       "createdAt": "2026-05-10T01:36:22.891Z"
