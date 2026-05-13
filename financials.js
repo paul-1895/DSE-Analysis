@@ -75,6 +75,32 @@ function buildUI() {
   </div>
 </div>`;
 
+  // Inject EPS modal into body after innerHTML is set so DOM is ready
+  if (!document.getElementById('eps-table-modal')) {
+    const modal = document.createElement('div');
+    modal.id = 'eps-table-modal';
+    modal.className = 'eps-modal-backdrop';
+    modal.innerHTML = `
+      <div class="eps-modal">
+        <div class="eps-modal-hd">
+          <span class="eps-modal-title">EPS DATA</span>
+          <button class="eps-modal-close" id="eps-modal-close-btn">&#x2715;</button>
+        </div>
+        <div class="eps-modal-body">
+          <div class="fin-table-wrap" id="table-eps"></div>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+    document.getElementById('eps-modal-close-btn').addEventListener('click', () => modal.classList.remove('open'));
+  }
+
+  // Wire up three-dots button (exists in DOM now)
+  const dotsBtn = root.querySelector('.fin-dots-btn');
+  if (dotsBtn) {
+    dotsBtn.addEventListener('click', () => document.getElementById('eps-table-modal').classList.add('open'));
+  }
+
   // Tab switching
   root.querySelectorAll('.fin-tab-btn').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
@@ -160,8 +186,14 @@ function buildEpsPanel() {
 <div class="fin-panel" data-panel="eps">
   <p class="fin-desc">Earnings Per Share — decimal value per quarter/year.</p>
   ${quarterlyFormHTML('eps', 'EPS Value', 'BDT')}
-  <div id="fin-chart-container" style="padding: 16px 0 8px;"></div>
-  <div class="fin-table-wrap" id="table-eps"></div>
+  <div class="fin-chart-wrap">
+    <button class="fin-dots-btn" title="View EPS data table">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
+      </svg>
+    </button>
+    <div id="fin-chart-container" style="padding: 16px 0 8px;"></div>
+  </div>
 </div>`;
 }
 
