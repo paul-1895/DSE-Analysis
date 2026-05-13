@@ -291,6 +291,7 @@ function renderChatUI() {
       <div class="chatbot-header">
         <h3>DSE Market Assistant</h3>
         <div class="chatbot-controls">
+          <button id="chatbot-minimize" title="Minimize" onclick="toggleMinimizeChatbot()">—</button>
           <button id="chatbot-clear" title="Clear history" onclick="clearChatHistory()">🗑️</button>
           <button id="chatbot-close" title="Close" onclick="toggleChatbot()">✕</button>
         </div>
@@ -370,3 +371,28 @@ function toggleChatbot() {
   const widget = document.querySelector('.chatbot-widget');
   if (widget) widget.style.display = widget.style.display === 'none' ? 'block' : 'none';
 }
+
+function toggleMinimizeChatbot() {
+  const container = document.getElementById('chatbot-container');
+  const widget = document.querySelector('.chatbot-widget');
+
+  if (!container || !widget) return;
+
+  container.classList.toggle('minimized');
+  widget.classList.toggle('minimized');
+
+  const btn = document.getElementById('chatbot-minimize');
+
+  if (widget.classList.contains('minimized')) {
+    btn.textContent = '+';
+    btn.title = 'Expand';
+  } else {
+    btn.textContent = '—';
+    btn.title = 'Minimize';
+  }
+}
+
+window.toggleMinimizeChatbot = toggleMinimizeChatbot;
+window.toggleChatbot = toggleChatbot;
+window.clearChatHistory = clearChatHistory;
+window.sendChatMessage = sendChatMessage;

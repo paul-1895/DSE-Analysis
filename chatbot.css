@@ -192,3 +192,47 @@
     height: 70vh;
   }
 }
+
+/* ─── MINIMIZED CHATBOT ───────────────────────── */
+
+.chatbot-widget.minimized {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+
+  width: 220px;
+  height: 64px;
+
+  border-radius: 999px;
+  overflow: hidden;
+
+  transition: all 0.3s ease;
+}
+
+.chatbot-widget.minimized .chatbot-messages,
+.chatbot-widget.minimized .chatbot-input-area {
+  display: none;
+}
+
+.chatbot-widget.minimized .chatbot-header {
+  height: 64px;
+  border-bottom: none;
+  cursor: pointer;
+  padding: 0 18px;
+}
+
+.chatbot-widget.minimized #chatbot-clear,
+.chatbot-widget.minimized #chatbot-close {
+  display: none;
+}
+
+/* FIX MINIMIZED CONTAINER */
+
+#chatbot-container.minimized {
+  height: 64px;
+  width: 220px;
+}
+
+#chatbot-container.minimized .chatbot-widget {
+  height: 64px;
+}
