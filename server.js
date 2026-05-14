@@ -548,6 +548,10 @@ app.delete('/api/news/:code/:id', (req, res) => {
   res.json({ ok: true });
 });
 
+// ─── PRICE HISTORY ───────────────────────────────────────────────────────────
+const historyRouter = require('./historyRouter');
+app.use('/api', historyRouter);
+
 // ─── START ────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`DSE server running on http://localhost:${PORT}`);

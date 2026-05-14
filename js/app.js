@@ -1,4 +1,5 @@
 import { initTheme, toggleTheme } from '../theme/theme.js';
+import { saveDailySnapshot } from '../priceHistory/priceHistory.js';
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let allStocks = [];
 let filteredStocks = [];
@@ -20,6 +21,8 @@ async function loadData() {
 
     allStocks = stocks;
     window.allStocksData = stocks; // expose to watchlist code in index.html
+
+    saveDailySnapshot(stocks); // persist today's prices to localStorage
 
     document.getElementById('last-updated').textContent =
       new Date(timestamp).toLocaleTimeString('en-BD');
