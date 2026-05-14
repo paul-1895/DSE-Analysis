@@ -296,7 +296,6 @@ async function scrapeStocks() {
   const $ = cheerio.load(html);
   const stocks = [];
 
-  // Debug: log first data row to verify indices (remove after confirming)
   let debugDone = false;
 
   $('table.table tr').each((i, row) => {
@@ -310,15 +309,13 @@ async function scrapeStocks() {
     const text = (idx) => $(cells[idx]).text().trim();
     const num  = (idx) => parseFloat(text(idx).replace(/,/g, '')) || 0;
 
-    // The code cell (index 1) contains an <a> with the ticker;
-    // the company name is in the link text or a title attribute.
     const codeCell = $(cells[1]);
     const linkEl   = codeCell.find('a').first();
     const code     = linkEl.text().trim() || text(1);
     const name     = codeCell.attr('title')
                   || linkEl.attr('title')
                   || linkEl.attr('data-name')
-                  || code; // fallback: use ticker if no name found
+                  || code;
 
     stocks.push({
       code,
@@ -349,6 +346,109 @@ app.get('/api/stocks', async (req, res) => {
   } catch (err) {
     console.error(err);
     if (cache) return res.json({ stocks: cache, timestamp: new Date(cacheTime).toISOString(), cached: true, error: err.message });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── COMPANY DETAILS SCRAPER ──────────────────────────────────────────────────
+const companyDetailCache = new Map();
+const DETAIL_CACHE_TTL   = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Scrape rich company detail from dsebd.org/displayCompany.php
+ * Returns an object with all available fields (null when not found).
+ */
+async function scrapeCompanyDetails(code) {
+  const url = `https://www.dsebd.org/displayCompany.php?name=${encodeURIComponent(code)}`;
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      'Accept': 'text/html,application/xhtml+xml'
+    }
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const html = await res.text();
+  const $    = cheerio.load(html);
+
+  const details = {
+    weekHigh52:        null,
+    weekLow52:         null,
+    marketCap:         null,
+    paidUpCapital:     null,
+    authorizedCapital: null,
+    nav:               null,
+    totalShares:       null,
+    cashDividend:      null,
+    stockDividend:     null,
+    beta:              null,
+    shortTermLoan:     null,
+    longTermLoan:      null,
+    dividendYield:     null,
+    eps:               null,
+    pe:                null,
+  };
+
+  // Generic key-value extractor: scan all table rows, match label in any cell,
+  // take the NEXT cell as the value. Handles 2-col and multi-col tables.
+  function extract(patterns) {
+    let found = null;
+    $('table tr').each((_, row) => {
+      if (found) return false;
+      const cells = $(row).find('td, th');
+      cells.each((i, cell) => {
+        if (found) return false;
+        const label = $(cell).text().trim().toLowerCase()
+          .replace(/[:\-_]/g, ' ').replace(/\s+/g, ' ');
+        const matched = patterns.some(p => label.includes(p));
+        if (matched && i + 1 < cells.length) {
+          const raw = $(cells[i + 1]).text().trim().replace(/\s+/g, ' ');
+          if (raw && raw !== '—' && raw !== '-' && raw !== 'N/A') {
+            found = raw;
+          }
+        }
+      });
+    });
+    return found;
+  }
+
+  details.weekHigh52        = extract(['52 week high', '52w high', '52 wk high', '52week high', 'year high', '52 weeks high']);
+  details.weekLow52         = extract(['52 week low',  '52w low',  '52 wk low',  '52week low',  'year low',  '52 weeks low']);
+  details.marketCap         = extract(['market cap', 'market capitaliz', 'mkt cap']);
+  details.paidUpCapital     = extract(['paid up capital', 'paid-up capital', 'paidup capital', 'paid up cap']);
+  details.authorizedCapital = extract(['authorized capital', 'authorised capital', 'authorised cap', 'authorized cap']);
+  details.nav               = extract(['nav per share', 'nav/share', 'net asset value per share', 'book value per share', 'nav']);
+  details.totalShares        = extract(['total shares', 'shares outstanding', 'no. of shares', 'number of shares', 'outstanding shares', 'total no of share', 'no of share']);
+  details.cashDividend      = extract(['cash dividend', 'cash div']);
+  details.stockDividend     = extract(['stock dividend', 'bonus share', 'bonus dividend', 'stock div', 'scrip dividend']);
+  details.beta              = extract(['beta']);
+  details.shortTermLoan     = extract(['short term loan', 'short-term loan', 'short term borrowing', 'st loan', 'short term debt']);
+  details.longTermLoan      = extract(['long term loan',  'long-term loan',  'long term borrowing',  'lt loan', 'long term debt']);
+  details.dividendYield     = extract(['dividend yield', 'div yield', 'yield %', 'dividend yield %']);
+  details.eps               = extract(['eps', 'earnings per share', 'earning per share']);
+  details.pe                = extract(['p/e ratio', 'pe ratio', 'price earning ratio', 'price to earning', 'p/e', 'p e ratio']);
+
+  // Log what we found for debugging
+  console.log(`[company-details] ${code}:`, JSON.stringify(details));
+  return details;
+}
+
+app.get('/api/company-details/:code', async (req, res) => {
+  const code   = req.params.code.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const now    = Date.now();
+  const cached = companyDetailCache.get(code);
+
+  if (cached && now - cached.time < DETAIL_CACHE_TTL) {
+    return res.json({ ...cached.data, cached: true });
+  }
+
+  try {
+    const data = await scrapeCompanyDetails(code);
+    companyDetailCache.set(code, { data, time: now });
+    res.json({ ...data, cached: false });
+  } catch (err) {
+    console.error(`[company-details] Error scraping ${code}:`, err.message);
+    // Return stale cache if available, otherwise empty object
+    if (cached) return res.json({ ...cached.data, cached: true, stale: true });
     res.status(500).json({ error: err.message });
   }
 });
@@ -448,98 +548,9 @@ app.delete('/api/news/:code/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-// ─── SUPPORT / RESISTANCE ROUTES ─────────────────────────────────────────────
-// Add this block to server.js (before app.listen)
-
-const SR_DIR = path.join(__dirname, 'sr_levels');
-if (!fs.existsSync(SR_DIR)) fs.mkdirSync(SR_DIR);
-
-function srFilePath(code) {
-  const safe = code.replace(/[^A-Za-z0-9_-]/g, '').toUpperCase();
-  return path.join(SR_DIR, `${safe}.json`);
-}
-
-function readSR(code) {
-  const fp = srFilePath(code);
-  if (!fs.existsSync(fp)) return { support: [], resistance: [] };
-  try { return JSON.parse(fs.readFileSync(fp, 'utf8')); }
-  catch { return { support: [], resistance: [] }; }
-}
-
-function writeSR(code, data) {
-  fs.writeFileSync(srFilePath(code), JSON.stringify(data, null, 2), 'utf8');
-}
-
-// GET all S/R levels for a stock
-app.get('/api/sr/:code', (req, res) => {
-  res.json(readSR(req.params.code));
-});
-
-// POST add a level  { type: 'support'|'resistance', price: number, note?: string }
-app.post('/api/sr/:code', express.json(), (req, res) => {
-  const { type, price, note } = req.body || {};
-  if (!['support', 'resistance'].includes(type)) return res.status(400).json({ error: 'type must be support or resistance' });
-  const p = parseFloat(price);
-  if (!p || p <= 0) return res.status(400).json({ error: 'Invalid price' });
-  const data = readSR(req.params.code);
-  const entry = { id: Date.now().toString(), price: p, note: (note || '').trim(), createdAt: new Date().toISOString() };
-  data[type].push(entry);
-  // Keep ascending
-  data[type].sort((a, b) => a.price - b.price);
-  writeSR(req.params.code, data);
-  res.json(entry);
-});
-
-// PATCH update a level  { price?, note? }
-app.patch('/api/sr/:code/:type/:id', express.json(), (req, res) => {
-  const { type, id } = req.params;
-  if (!['support', 'resistance'].includes(type)) return res.status(400).json({ error: 'Invalid type' });
-  const data = readSR(req.params.code);
-  const entry = data[type].find(e => e.id === id);
-  if (!entry) return res.status(404).json({ error: 'Not found' });
-  if (req.body.price !== undefined) {
-    const p = parseFloat(req.body.price);
-    if (!p || p <= 0) return res.status(400).json({ error: 'Invalid price' });
-    entry.price = p;
-  }
-  if (req.body.note !== undefined) entry.note = req.body.note.trim();
-  data[type].sort((a, b) => a.price - b.price);
-  writeSR(req.params.code, data);
-  res.json(entry);
-});
-
-// DELETE a level
-app.delete('/api/sr/:code/:type/:id', (req, res) => {
-  const { type, id } = req.params;
-  if (!['support', 'resistance'].includes(type)) return res.status(400).json({ error: 'Invalid type' });
-  const data = readSR(req.params.code);
-  const before = data[type].length;
-  data[type] = data[type].filter(e => e.id !== id);
-  if (data[type].length === before) return res.status(404).json({ error: 'Not found' });
-  writeSR(req.params.code, data);
-  res.json({ ok: true });
-});
-
-const { loadProjectContext } = require('./chat-context');
-
-app.post('/api/chat/context', async (req, res) => {
-  const { filePath } = req.body;
-
-  const data = await loadProjectContext(filePath);
-
-  if (!data) {
-    return res.status(404).json({
-      error: 'File not found'
-    });
-  }
-
-  res.json(data);
-});
-
 // ─── START ────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`DSE server running on http://localhost:${PORT}`);
   console.log(`Watchlist stored at:  ${WATCHLIST_FILE}`);
   console.log(`Portfolios stored at: ${PORTFOLIO_FILE}`);
 });
-

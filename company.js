@@ -8,33 +8,8 @@ import { initTheme, toggleTheme } from '../theme/theme.js';
 // Shared state — also consumed by news.js
 window.currentStockCode = null;
 
-// /* ----------------------------------------------------------------
-//    THEME
-// ---------------------------------------------------------------- */
-// function toggleTheme() {
-//   const html     = document.documentElement;
-//   const isLight  = html.getAttribute('data-theme') === 'light';
-//   const newTheme = isLight ? 'dark' : 'light';
-//   html.setAttribute('data-theme', newTheme);
-//   localStorage.setItem('dse-theme', newTheme);
-//   updateThemeButton(newTheme);
-//   if (currentStockCode) loadTradingViewChart(currentStockCode);
-// }
-
-// function updateThemeButton(theme) {
-//   const icon  = document.getElementById('theme-icon');
-//   const label = document.getElementById('theme-label');
-//   if (theme === 'light') { icon.textContent = '🌙'; label.textContent = 'Dark';  }
-//   else                   { icon.textContent = '☀️'; label.textContent = 'Light'; }
-// }
-
-// function initTheme() {
-//   const saved       = localStorage.getItem('dse-theme');
-//   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-//   const theme       = saved || (prefersDark ? 'dark' : 'light');
-//   document.documentElement.setAttribute('data-theme', theme);
-//   updateThemeButton(theme);
-// }
+const API     = 'http://localhost:3000';
+const FIN_API = `${API}/api/financials`;
 
 /* ----------------------------------------------------------------
    LOAD PROFILE
@@ -52,7 +27,7 @@ async function loadProfile() {
   document.title = `${code} — DSE Company Profile`;
 
   try {
-    const res = await fetch('http://localhost:3000/api/stocks');
+    const res = await fetch(`${API}/api/stocks`);
     if (!res.ok) throw new Error(`Server error: ${res.status}`);
     const { stocks } = await res.json();
     const s = stocks.find(x => x.code === code.toUpperCase());
@@ -68,13 +43,126 @@ async function loadProfile() {
     document.getElementById('profile-loading').style.display = 'none';
     document.getElementById('profile-body').style.display    = 'block';
     loadNewsLinks(s.code);   // defined in news.js
-    initChatbot(s);          // Initialize chatbot with stock data
+
+    // Kick off enriched details in background (non-blocking)
+    fetchAndRenderDetails(s.code, s.ltp);
 
   } catch (err) {
     document.getElementById('profile-loading').innerHTML =
       `<p style="color:var(--loss)">Failed to load data: ${err.message}<br><br>
        <a href="/" style="color:var(--accent)">← Go back to Market</a></p>`;
   }
+}
+
+/* ----------------------------------------------------------------
+   FETCH ENRICHED DETAILS + RENDER STATS GRID
+   Runs in parallel: scraped company page + local EPS data
+---------------------------------------------------------------- */
+async function fetchAndRenderDetails(code, ltp) {
+  // Show loading skeleton on the stats grid
+  const grid = document.getElementById('company-detail-stats');
+  if (grid) {
+    grid.innerHTML = Array(15).fill(0).map(() => `
+      <div class="cds-card cds-card--loading">
+        <div class="cds-skeleton cds-skeleton--label"></div>
+        <div class="cds-skeleton cds-skeleton--value"></div>
+      </div>`).join('');
+  }
+
+  const [detailsResult, finResult] = await Promise.allSettled([
+    fetch(`${API}/api/company-details/${code}`).then(r => r.json()),
+    fetch(`${FIN_API}/${code}`).then(r => r.json()),
+  ]);
+
+  const d       = detailsResult.status === 'fulfilled' ? detailsResult.value : {};
+  const finData = finResult.status    === 'fulfilled' ? finResult.value    : {};
+
+  // ── P/E from last 4 quarters EPS ──────────────────────────────
+  const QORDER   = { Q1: 0, Q2: 1, Q3: 2, Q4: 3 };
+  const epsArr   = (finData.eps || []).sort(
+    (a, b) => b.year - a.year || (QORDER[b.quarter] ?? 0) - (QORDER[a.quarter] ?? 0)
+  );
+  const last4Eps = epsArr.slice(0, 4);
+  const totalEps = last4Eps.reduce((s, e) => s + (parseFloat(e.value) || 0), 0);
+  const localPE  = totalEps > 0 ? (ltp / totalEps).toFixed(2) : null;
+
+  // ── Derived values ─────────────────────────────────────────────
+  const numOf = str => parseFloat((str || '').toString().replace(/[^0-9.]/g, '')) || null;
+
+  const totalShares = numOf(d.totalShares);
+  const marketCap   = totalShares ? totalShares * ltp : null;
+
+  // ── Build stat definitions ─────────────────────────────────────
+  const stats = [
+    // Row A — Price / valuation
+    { label: 'LTP',            value: `৳ ${fmtN(ltp)}`,                         accent: ''       },
+    { label: 'P/E RATIO',      value: localPE || d.pe || null,                    accent: ''       },
+    { label: 'EPS (4 QTR)',    value: totalEps > 0 ? `৳ ${totalEps.toFixed(2)}` : fmtScraped(d.eps, '৳ '), accent: '' },
+    { label: 'MARKET CAP',     value: marketCap ? `৳ ${fmtLarge(marketCap)}` : null, accent: ''  },
+
+    // Row B — 52-week range
+    { label: '52W HIGH',       value: d.weekHigh52  ? `৳ ${d.weekHigh52}`  : null, accent: 'gain' },
+    { label: '52W LOW',        value: d.weekLow52   ? `৳ ${d.weekLow52}`   : null, accent: 'loss' },
+    { label: 'BETA',           value: d.beta || null,                               accent: ''     },
+    { label: 'DIVIDEND YIELD', value: d.dividendYield ? `${d.dividendYield}%` : null, accent: ''  },
+
+    // Row C — Dividends / NAV
+    { label: 'CASH DIVIDEND',  value: d.cashDividend  ? `${d.cashDividend}%`  : null, accent: 'gain' },
+    { label: 'STOCK DIVIDEND', value: d.stockDividend ? `${d.stockDividend}%` : null, accent: 'gain' },
+    { label: 'NAV / SHARE',    value: d.nav ? `৳ ${d.nav}` : null,                    accent: ''      },
+    { label: 'TOTAL SHARES',   value: totalShares ? fmtLarge(totalShares) : null,     accent: ''      },
+
+    // Row D — Capital structure / debt
+    { label: 'PAID UP CAP',    value: d.paidUpCapital     ? `৳ ${fmtLarge(numOf(d.paidUpCapital))}` : null,     accent: '' },
+    { label: 'AUTHORIZED CAP', value: d.authorizedCapital ? `৳ ${fmtLarge(numOf(d.authorizedCapital))}` : null, accent: '' },
+    { label: 'SHORT TERM LOAN',value: d.shortTermLoan     ? `৳ ${fmtLarge(numOf(d.shortTermLoan))}` : null,     accent: 'loss' },
+    { label: 'LONG TERM LOAN', value: d.longTermLoan      ? `৳ ${fmtLarge(numOf(d.longTermLoan))}` : null,      accent: 'loss' },
+  ];
+
+  renderStatsGrid(stats);
+}
+
+/* ----------------------------------------------------------------
+   RENDER — stat grid cards
+---------------------------------------------------------------- */
+function renderStatsGrid(stats) {
+  const grid = document.getElementById('company-detail-stats');
+  if (!grid) return;
+
+  grid.innerHTML = stats.map(s => {
+    const val = s.value;
+    const display = (val !== null && val !== undefined && val !== '' && val !== '0' && val !== '0.00')
+      ? val : '—';
+    const accentClass = s.accent ? ` cds-val--${s.accent}` : '';
+    const emptyClass  = display === '—' ? ' cds-card--empty' : '';
+    return `
+      <div class="cds-card${emptyClass}">
+        <div class="cds-label">${s.label}</div>
+        <div class="cds-val${accentClass}">${display}</div>
+      </div>`;
+  }).join('');
+}
+
+/* ----------------------------------------------------------------
+   FORMAT HELPERS
+---------------------------------------------------------------- */
+function fmtN(n, dec = 2) {
+  if (n == null || isNaN(n)) return '—';
+  return parseFloat(n).toLocaleString('en-BD', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+
+function fmtLarge(n) {
+  if (!n || isNaN(n)) return null;
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return n.toFixed(2);
+}
+
+function fmtScraped(val, prefix = '') {
+  if (!val) return null;
+  const n = parseFloat(val.toString().replace(/[^0-9.-]/g, ''));
+  return isNaN(n) ? val : `${prefix}${n.toFixed(2)}`;
 }
 
 /* ----------------------------------------------------------------
@@ -99,7 +187,7 @@ function populateProfile(s) {
   chgEl.textContent = `${sign}${fmt(s.change)} (${sign}${pct}%)`;
   chgEl.className   = `price-change-big ${dir}`;
 
-  // Stats
+  // Top stats (4-card row kept for at-a-glance)
   document.getElementById('p-high').textContent   = s.high  ? '৳ ' + fmt(s.high)  : '—';
   document.getElementById('p-low').textContent    = s.low   ? '৳ ' + fmt(s.low)   : '—';
   document.getElementById('p-close').textContent  = s.close ? '৳ ' + fmt(s.close) : '—';
@@ -120,7 +208,7 @@ function populateProfile(s) {
   document.getElementById('p-dse-link').href =
     `https://www.dsebd.org/displayCompany.php?name=${encodeURIComponent(s.code)}`;
 
-  // Detail table
+  // Detail summary table (compact, below the big grid)
   document.getElementById('d-code').textContent   = s.code;
   document.getElementById('d-name').textContent   = s.name;
   document.getElementById('d-ltp').textContent    = '৳ ' + fmt(s.ltp);
@@ -137,7 +225,7 @@ function populateProfile(s) {
   window.currentStockCode = s.code;
   loadTradingViewChart(s.code);
   if (window.initFinancials) window.initFinancials(s.code);
-  if (window.initSRLevels) window.initSRLevels(s.code, s.ltp);
+  if (window.initSRLevels)   window.initSRLevels(s.code, s.ltp);
 }
 
 /* ----------------------------------------------------------------
@@ -196,13 +284,11 @@ function loadTradingViewChart(code) {
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   document
-  .getElementById('theme-toggle-btn')
-  .addEventListener('click', () => {
-    toggleTheme(() => {
-      if (window.currentStockCode) {
-        loadTradingViewChart(window.currentStockCode);
-      }
+    .getElementById('theme-toggle-btn')
+    .addEventListener('click', () => {
+      toggleTheme(() => {
+        if (window.currentStockCode) loadTradingViewChart(window.currentStockCode);
+      });
     });
-  });
   loadProfile();
 });
