@@ -552,6 +552,94 @@ app.delete('/api/news/:code/:id', (req, res) => {
 const historyRouter = require('./historyRouter');
 app.use('/api', historyRouter);
 
+// ─── SUPPORT / RESISTANCE ROUTES ─────────────────────────────────────────────
+// Add this block to server.js (before app.listen)
+
+const SR_DIR = path.join(__dirname, 'sr_levels');
+if (!fs.existsSync(SR_DIR)) fs.mkdirSync(SR_DIR);
+
+function srFilePath(code) {
+  const safe = code.replace(/[^A-Za-z0-9_-]/g, '').toUpperCase();
+  return path.join(SR_DIR, `${safe}.json`);
+}
+
+function readSR(code) {
+  const fp = srFilePath(code);
+  if (!fs.existsSync(fp)) return { support: [], resistance: [] };
+  try { return JSON.parse(fs.readFileSync(fp, 'utf8')); }
+  catch { return { support: [], resistance: [] }; }
+}
+
+function writeSR(code, data) {
+  fs.writeFileSync(srFilePath(code), JSON.stringify(data, null, 2), 'utf8');
+}
+
+// GET all S/R levels for a stock
+app.get('/api/sr/:code', (req, res) => {
+  res.json(readSR(req.params.code));
+});
+
+// POST add a level  { type: 'support'|'resistance', price: number, note?: string }
+app.post('/api/sr/:code', express.json(), (req, res) => {
+  const { type, price, note } = req.body || {};
+  if (!['support', 'resistance'].includes(type)) return res.status(400).json({ error: 'type must be support or resistance' });
+  const p = parseFloat(price);
+  if (!p || p <= 0) return res.status(400).json({ error: 'Invalid price' });
+  const data = readSR(req.params.code);
+  const entry = { id: Date.now().toString(), price: p, note: (note || '').trim(), createdAt: new Date().toISOString() };
+  data[type].push(entry);
+  // Keep ascending
+  data[type].sort((a, b) => a.price - b.price);
+  writeSR(req.params.code, data);
+  res.json(entry);
+});
+
+// PATCH update a level  { price?, note? }
+app.patch('/api/sr/:code/:type/:id', express.json(), (req, res) => {
+  const { type, id } = req.params;
+  if (!['support', 'resistance'].includes(type)) return res.status(400).json({ error: 'Invalid type' });
+  const data = readSR(req.params.code);
+  const entry = data[type].find(e => e.id === id);
+  if (!entry) return res.status(404).json({ error: 'Not found' });
+  if (req.body.price !== undefined) {
+    const p = parseFloat(req.body.price);
+    if (!p || p <= 0) return res.status(400).json({ error: 'Invalid price' });
+    entry.price = p;
+  }
+  if (req.body.note !== undefined) entry.note = req.body.note.trim();
+  data[type].sort((a, b) => a.price - b.price);
+  writeSR(req.params.code, data);
+  res.json(entry);
+});
+
+// DELETE a level
+app.delete('/api/sr/:code/:type/:id', (req, res) => {
+  const { type, id } = req.params;
+  if (!['support', 'resistance'].includes(type)) return res.status(400).json({ error: 'Invalid type' });
+  const data = readSR(req.params.code);
+  const before = data[type].length;
+  data[type] = data[type].filter(e => e.id !== id);
+  if (data[type].length === before) return res.status(404).json({ error: 'Not found' });
+  writeSR(req.params.code, data);
+  res.json({ ok: true });
+});
+
+const { loadProjectContext } = require('./chat-context');
+
+app.post('/api/chat/context', async (req, res) => {
+  const { filePath } = req.body;
+
+  const data = await loadProjectContext(filePath);
+
+  if (!data) {
+    return res.status(404).json({
+      error: 'File not found'
+    });
+  }
+
+  res.json(data);
+});
+
 // ─── START ────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`DSE server running on http://localhost:${PORT}`);
