@@ -64,9 +64,9 @@
   background: var(--bg-card);
   border: 1px solid var(--border-glow);
   border-radius: 16px;
-  width: 480px;
+  width: 520px;
   max-width: 94vw;
-  max-height: 80vh;
+  max-height: 84vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255,255,255,0.04);
@@ -171,7 +171,7 @@
 .screener-rescan-btn.spinning svg { animation: screenerSpin 0.7s linear infinite; }
 @keyframes screenerSpin { to { transform: rotate(360deg); } }
 
-/* Lists grid */
+/* ─── Lists grid — 2-col top row, hammer spans full width ── */
 .screener-lists-grid {
   padding: 18px 22px 22px;
   display: grid;
@@ -205,14 +205,50 @@
 .screener-list-card.resistance::before {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.06), transparent 60%);
 }
+.screener-list-card.hammer::before {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), transparent 60%);
+}
+
+/* Hammer card spans both columns */
+.screener-list-card.hammer {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: start;
+  column-gap: 16px;
+}
+.screener-list-card.hammer .screener-list-card-icon {
+  grid-row: 1 / 3;
+  align-self: center;
+  margin-bottom: 0;
+}
+.screener-list-card.hammer .screener-list-card-name {
+  grid-column: 2;
+  grid-row: 1;
+}
+.screener-list-card.hammer .screener-list-card-desc {
+  grid-column: 2;
+  grid-row: 2;
+  margin-bottom: 0;
+}
+.screener-list-card.hammer .screener-list-card-count-row {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
 .screener-list-card:hover {
   border-color: var(--border-glow);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
 .screener-list-card:hover::before { opacity: 1; }
-.screener-list-card.support:hover  { border-color: rgba(34, 197, 94, 0.4); }
+.screener-list-card.support:hover    { border-color: rgba(34, 197, 94, 0.4); }
 .screener-list-card.resistance:hover { border-color: rgba(239, 68, 68, 0.4); }
+.screener-list-card.hammer:hover     { border-color: rgba(245, 158, 11, 0.5); box-shadow: 0 8px 24px rgba(245,158,11,0.1); }
 
 .screener-list-card-icon {
   width: 36px;
@@ -234,6 +270,13 @@
   background: rgba(239, 68, 68, 0.12);
   color: #ef4444;
   border: 1px solid rgba(239, 68, 68, 0.25);
+}
+.screener-list-card.hammer .screener-list-card-icon {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  width: 42px;
+  height: 42px;
 }
 .screener-list-card-icon svg { width: 18px; height: 18px; }
 
@@ -269,8 +312,10 @@
   font-weight: 700;
   line-height: 1;
 }
-.screener-list-card.support  .screener-list-card-count { color: #22c55e; }
+.screener-list-card.support    .screener-list-card-count { color: #22c55e; }
 .screener-list-card.resistance .screener-list-card-count { color: #ef4444; }
+.screener-list-card.hammer     .screener-list-card-count { color: #f59e0b; }
+
 .screener-list-card-count-label {
   font-family: var(--mono);
   font-size: 8px;
@@ -324,9 +369,9 @@
   background: var(--bg-card);
   border: 1px solid var(--border-glow);
   border-radius: 16px;
-  width: 560px;
+  width: 580px;
   max-width: 95vw;
-  max-height: 82vh;
+  max-height: 84vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255,255,255,0.04);
@@ -361,7 +406,6 @@
 .screener-detail-back:hover { color: var(--text-primary); background: var(--bg-row-hover); }
 .screener-detail-back svg { width: 15px; height: 15px; }
 
-.screener-detail-title-wrap {}
 .screener-detail-title {
   font-family: var(--mono);
   font-size: 12px;
@@ -398,6 +442,11 @@
   color: #ef4444;
   border: 1px solid rgba(239, 68, 68, 0.25);
 }
+.screener-detail-pill.hammer {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
 .screener-detail-pill svg { width: 9px; height: 9px; }
 
 /* Detail list body */
@@ -419,6 +468,10 @@
   top: 0;
   z-index: 2;
 }
+/* Hammer detail has wider last column for the signal widget */
+.screener-table-header.hammer-header {
+  grid-template-columns: 1fr 80px 80px 90px;
+}
 .screener-th {
   font-family: var(--mono);
   font-size: 8px;
@@ -439,6 +492,9 @@
   align-items: center;
   transition: background 0.12s;
   cursor: pointer;
+}
+.screener-stock-row.hammer-row {
+  grid-template-columns: 1fr 80px 80px 90px;
 }
 .screener-stock-row:last-child { border-bottom: none; }
 .screener-stock-row:hover { background: var(--bg-row-hover); }
@@ -473,6 +529,12 @@
   background: rgba(239, 68, 68, 0.12);
   color: #ef4444;
 }
+.screener-stock-level-badge.hammer {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  letter-spacing: 0.3px;
+}
 
 .screener-stock-ltp {
   font-family: var(--mono);
@@ -494,8 +556,112 @@
   font-size: 10px;
   text-align: right;
 }
-.screener-stock-level-price.support  { color: #22c55e; }
+.screener-stock-level-price.support    { color: #22c55e; }
 .screener-stock-level-price.resistance { color: #ef4444; }
+
+/* ─── Hammer signal column ───────────────────────────────── */
+.screener-hammer-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+.screener-hammer-ratio {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  cursor: help;
+}
+.screener-hammer-ratio-val {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #f59e0b;
+  text-shadow: 0 0 10px rgba(245,158,11,0.4);
+}
+.screener-hammer-ratio-label {
+  font-family: var(--mono);
+  font-size: 7px;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+/* Mini wick-length bar */
+.screener-hammer-wick-bar {
+  width: 56px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.screener-hammer-wick-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 6px rgba(245,158,11,0.5);
+}
+
+/* ─── Hammer Pattern Legend ──────────────────────────────── */
+.screener-hammer-legend {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(245, 158, 11, 0.04);
+  flex-shrink: 0;
+}
+
+/* Mini illustrated candle */
+.hammer-legend-candle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+.hlc-upper-wick {
+  width: 2px;
+  height: 5px;
+  background: var(--text-muted);
+  border-radius: 1px;
+}
+.hlc-body {
+  width: 14px;
+  height: 12px;
+  background: var(--gain);
+  border: 1.5px solid var(--gain);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(34,197,94,0.35);
+}
+.hlc-lower-wick {
+  width: 2px;
+  height: 36px;
+  background: linear-gradient(180deg, #f59e0b, #fbbf24);
+  border-radius: 1px;
+  box-shadow: 0 0 8px rgba(245,158,11,0.4);
+}
+
+.hammer-legend-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.hlc-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  letter-spacing: 0.3px;
+}
+.hlc-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
 
 /* Empty state */
 .screener-detail-empty {
@@ -533,7 +699,7 @@
   color: var(--text-muted);
   margin: 0;
   line-height: 1.6;
-  max-width: 240px;
+  max-width: 260px;
 }
 
 /* ─── Pulsing dot for "live" indicator ───────────────────── */
@@ -571,5 +737,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  position: sticky;
+  top: 33px;   /* sits just below the sticky table header */
+  z-index: 1;
 }
 .screener-tolerance-note svg { width: 10px; height: 10px; flex-shrink: 0; }
