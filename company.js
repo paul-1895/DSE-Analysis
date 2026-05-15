@@ -182,6 +182,11 @@ function populateProfile(s) {
   document.getElementById('p-code').textContent  = s.code;
   document.getElementById('p-code2').textContent = s.code;
   document.getElementById('p-name').textContent  = s.name;
+  // Category badge colours: A=green, B=amber, Z=muted
+  const catEl = document.getElementById('p-category');
+  const cat   = s.category || 'Z';
+  catEl.textContent = cat;
+  catEl.style.color = cat === 'A' ? 'var(--gain)' : cat === 'B' ? '#d29922' : 'var(--text-muted)';
   document.getElementById('p-ltp').textContent   = '৳ ' + fmt(s.ltp);
   const chgEl = document.getElementById('p-change');
   chgEl.textContent = `${sign}${fmt(s.change)} (${sign}${pct}%)`;
@@ -210,6 +215,7 @@ function populateProfile(s) {
 
   // Detail summary table (compact, below the big grid)
   document.getElementById('d-code').textContent   = s.code;
+  document.getElementById('d-category').textContent = s.category || 'Z';
   document.getElementById('d-name').textContent   = s.name;
   document.getElementById('d-ltp').textContent    = '৳ ' + fmt(s.ltp);
   document.getElementById('d-ycp').textContent    = s.ycp   ? '৳ ' + fmt(s.ycp)   : '—';

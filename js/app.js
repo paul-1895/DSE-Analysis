@@ -1,5 +1,6 @@
 import { initTheme, toggleTheme } from '../theme/theme.js';
 import { saveDailySnapshot } from '../priceHistory/priceHistory.js';
+
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let allStocks = [];
 let filteredStocks = [];
@@ -50,7 +51,7 @@ function buildTicker(stocks) {
   if (!notable.length) { track.textContent = 'No market movement data'; return; }
 
   const items = notable.map(s => {
-    const dir = s.change > 0 ? 'up' : 'dn';
+    const dir  = s.change > 0 ? 'up' : 'dn';
     const sign = s.change > 0 ? '▲' : '▼';
     return `<span class="ticker-item ${dir}"><strong>${s.code}</strong> ৳${s.ltp.toFixed(1)} <em>${sign}${Math.abs(s.change).toFixed(1)}</em></span>`;
   }).join('');
@@ -135,11 +136,18 @@ function sortStocks(arr) {
 }
 
 function updateSortArrows() {
-  ['code','name','ltp','high','low','close','ycp','change','volume'].forEach(k => {
+  ['code', 'category', 'ltp', 'high', 'low', 'close', 'ycp', 'change', 'volume'].forEach(k => {
     const el = document.getElementById('sort-' + k);
     if (!el) return;
     el.textContent = currentSort.key === k ? (currentSort.dir === 'asc' ? '↑' : '↓') : '';
   });
+}
+
+// ─── CATEGORY BADGE ───────────────────────────────────────────────────────────
+function catBadge(cat) {
+  const c = cat === 'A' ? '#39d353' : cat === 'B' ? '#d29922' : '#8b949e';
+  return `<span style="font-family:var(--mono,monospace);font-size:10px;font-weight:700;` +
+    `padding:2px 6px;border-radius:3px;background:${c}22;color:${c};border:1px solid ${c}55">${cat || 'Z'}</span>`;
 }
 
 // ─── RENDER TABLE ─────────────────────────────────────────────────────────────
@@ -149,12 +157,12 @@ function fmt(n) {
 function fmtVol(n) {
   if (!n) return '—';
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M';
-  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
+  if (n >= 1_000)     return (n / 1_000).toFixed(1)     + 'K';
   return n.toLocaleString();
 }
 
 function renderTable(stocks) {
-  const tbody = document.getElementById('stocks-tbody');
+  const tbody  = document.getElementById('stocks-tbody');
   const footer = document.getElementById('table-footer');
 
   if (!stocks.length) {
@@ -164,18 +172,18 @@ function renderTable(stocks) {
   }
 
   tbody.innerHTML = stocks.map((s, i) => {
-    const dir = s.change > 0 ? 'up' : s.change < 0 ? 'dn' : '';
+    const dir  = s.change > 0 ? 'up' : s.change < 0 ? 'dn' : '';
     const sign = s.change > 0 ? '+' : '';
-    const pct = s.ycp ? ((s.change / s.ycp) * 100).toFixed(2) : '0.00';
-    // NOTE: no fav-cell td here — injectFavCells() adds it after render
+    const pct  = s.ycp ? ((s.change / s.ycp) * 100).toFixed(2) : '0.00';
     return `<tr data-code="${s.code}" data-name="${escAttrApp(s.name)}" onclick="goToCompany(event,'${escAttrApp(s.code)}')" style="cursor:pointer">
       <td class="th-rank">${i + 1}</td>
+      <td style="text-align:center">${catBadge(s.category)}</td>
       <td class="th-code"><strong>${s.code}</strong></td>
       <td class="th-num">৳${fmt(s.ltp)}</td>
-      <td class="th-num">${s.high ? '৳' + fmt(s.high) : '—'}</td>
-      <td class="th-num">${s.low ? '৳' + fmt(s.low) : '—'}</td>
+      <td class="th-num">${s.high  ? '৳' + fmt(s.high)  : '—'}</td>
+      <td class="th-num">${s.low   ? '৳' + fmt(s.low)   : '—'}</td>
       <td class="th-num">${s.close ? '৳' + fmt(s.close) : '—'}</td>
-      <td class="th-num">${s.ycp ? '৳' + fmt(s.ycp) : '—'}</td>
+      <td class="th-num">${s.ycp   ? '৳' + fmt(s.ycp)   : '—'}</td>
       <td class="th-num ${dir}">${sign}${fmt(s.change)} <small>(${sign}${pct}%)</small></td>
       <td class="th-num">${fmtVol(s.volume)}</td>
     </tr>`;
@@ -205,19 +213,18 @@ document.addEventListener('DOMContentLoaded', () => {
     .addEventListener('click', toggleTheme);
 
   document
-  .getElementById('search-input')
-  .addEventListener('input', filterTable);
+    .getElementById('search-input')
+    .addEventListener('input', filterTable);
 
   loadData();
 
   // Auto-refresh every 5 minutes
-  setInterval(() => {
-    loadData();
-  }, 5 * 60 * 1000);
+  setInterval(loadData, 5 * 60 * 1000);
 });
-window.loadData = loadData;
+
+window.loadData    = loadData;
 window.filterTable = filterTable;
-window.setFilter = setFilter;
-window.sortTable = sortTable;
-window.toggleSort = toggleSort;
+window.setFilter   = setFilter;
+window.sortTable   = sortTable;
+window.toggleSort  = toggleSort;
 window.goToCompany = goToCompany;

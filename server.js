@@ -279,6 +279,23 @@ app.delete('/api/portfolios/:id/dividends/:divId', (req, res) => {
   res.json({ ok: true });
 });
 
+// ─── STOCK CATEGORIES ────────────────────────────────────────────────────────
+const CATEGORIES_FILE = path.join(__dirname, 'stock-categories.json');
+
+function readCategories() {
+  try {
+    return JSON.parse(fs.readFileSync(CATEGORIES_FILE, 'utf-8')).categories || {};
+  } catch { return {}; }
+}
+
+app.get('/api/categories', (req, res) => {
+  try {
+    res.json(JSON.parse(fs.readFileSync(CATEGORIES_FILE, 'utf-8')));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── DSE SCRAPER ─────────────────────────────────────────────────────────────
 let cache = null;
 let cacheTime = 0;
@@ -296,6 +313,7 @@ async function scrapeStocks() {
   const $ = cheerio.load(html);
   const stocks = [];
 
+  const cats = readCategories();
   let debugDone = false;
 
   $('table.table tr').each((i, row) => {
@@ -320,6 +338,7 @@ async function scrapeStocks() {
     stocks.push({
       code,
       name,
+      category: cats[code] || 'Z',
       ltp:    num(2),
       high:   num(3),
       low:    num(4),
